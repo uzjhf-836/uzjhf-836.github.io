@@ -249,7 +249,7 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: 1fr 1.2fr;
+      grid-template-columns: 1.1fr 1fr;
       gap: 3.5rem;
       align-items: start;
     }
@@ -261,13 +261,38 @@
       }
     }
 
-    .profile {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+    /* 个人介绍卡片 */
+    .profile-card {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 2rem 2.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 12px 32px -12px rgba(40, 20, 60, 0.12);
+      transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s;
+      will-change: background, border-color, box-shadow;
+      backface-visibility: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .profile h1 {
+    .profile-card:hover {
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 16px 40px -14px rgba(40, 20, 60, 0.16);
+      transform: translateY(-2px);
+    }
+
+    body.dark .profile-card {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark .profile-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-card h1 {
       font-size: 2.6rem;
       font-weight: 700;
       letter-spacing: -0.02em;
@@ -277,78 +302,36 @@
       transition: color 0.2s ease;
     }
 
-    body.dark .profile h1 {
+    body.dark .profile-card h1 {
       color: #ece4f5;
     }
 
-    .profile .title-role {
+    .profile-card .title-role {
       font-size: 0.95rem;
       font-weight: 400;
       color: #4e3d60;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.8rem;
       opacity: 0.8;
       transition: color 0.2s ease;
       line-height: 1.8;
     }
 
-    body.dark .profile .title-role {
+    body.dark .profile-card .title-role {
       color: #b0a0c0;
     }
 
-    .profile .title-role .dot {
-      display: inline-block;
-      margin: 0 0.3rem;
-    }
-
-    .profile .bio {
+    .profile-card .bio {
       font-size: 1rem;
       line-height: 1.7;
       color: #41364b;
-      max-width: 95%;
       font-weight: 400;
-      margin: 0.6rem 0 1.8rem 0;
       opacity: 0.85;
       transition: color 0.2s ease;
+      margin: 0;
     }
 
-    body.dark .profile .bio {
+    body.dark .profile-card .bio {
       color: #b0a4be;
-    }
-
-    .social-links {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .social-links a {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      color: #3f334d;
-      font-size: 1.2rem;
-      transition: 0.15s;
-      text-decoration: none;
-      background: transparent;
-      border: none;
-    }
-
-    .social-links a:hover {
-      color: #1d1129;
-      transform: scale(1.1);
-      background: rgba(60, 40, 80, 0.05);
-    }
-
-    body.dark .social-links a {
-      color: #b0a0c0;
-    }
-
-    body.dark .social-links a:hover {
-      color: #f0e8f8;
-      background: rgba(255, 255, 255, 0.05);
     }
 
     .contact-card {
@@ -497,7 +480,7 @@
     }
 
     @media (max-width: 450px) {
-      .profile h1 {
+      .profile-card h1 {
         font-size: 2.2rem;
       }
       .contact-card {
@@ -510,6 +493,9 @@
       .contact-item .label {
         width: 100%;
         font-size: 0.8rem;
+      }
+      .profile-card {
+        padding: 1.5rem;
       }
     }
   </style>
@@ -532,24 +518,20 @@
     </div>
 
     <div class="main-grid">
-      <div class="profile">
+      <!-- 个人介绍卡片 -->
+      <div class="profile-card">
         <h1>Zhixie</h1>
         <div class="title-role">
           · 最屎屎山代码 2147483647年保持者<br>
           · 代码续命用佛祖 9223372036854775807年保持者
         </div>
         <p class="bio">
-          我不知道怎么写<br>
-          谢谢
+          热爱构建优雅的数字体验，专注前端与交互设计。<br>
+          目前探索 AI 与创意编程的交汇点。
         </p>
-        <div class="social-links">
-          <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-          <a href="#" aria-label="Email"><i class="fas fa-envelope"></i></a>
-        </div>
       </div>
 
+      <!-- 联系方式卡片 -->
       <div class="contact-card">
         <div class="card-title">
           <i class="fas fa-address-card"></i> 联系方式
@@ -570,13 +552,13 @@
         <div class="contact-item">
           <div class="icon"><i class="fab fa-bilibili"></i></div>
           <div class="label">Bilibili</div>
-          <div class="value"><a href="https://space.bilibili.com/1330332851" target="_blank">space.bilibili.com/1330332851</a></div>
+          <div class="value"><a href="https://space.bilibili.com/1330332851" target="_blank">点击跳转</a></div>
         </div>
 
         <div class="contact-item">
           <div class="icon"><i class="fab fa-github"></i></div>
           <div class="label">GitHub</div>
-          <div class="value"><a href="https://github.com/uzjhf-836/" target="_blank">github.com/uzjhf-836</a></div>
+          <div class="value"><a href="https://github.com/uzjhf-836/" target="_blank">点击跳转</a></div>
         </div>
       </div>
     </div>
