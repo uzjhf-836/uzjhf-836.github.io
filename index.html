@@ -1,10 +1,638 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <title>Zhixie's Page!</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zhixie's Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    @font-face {
+      font-family: 'HarmonyOS Sans SC';
+      src: url('https://uzjhf-836.github.io/font/HarmonyOS_Sans_SC_Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      transition: background 1.8s ease, background-image 1.8s ease;
+      background: #f3f0f5;
+      background-image: radial-gradient(circle at 10% 20%, rgba(235, 215, 250, 0.4) 0%, transparent 35%),
+                        radial-gradient(circle at 90% 80%, rgba(200, 220, 255, 0.4) 0%, transparent 40%),
+                        linear-gradient(145deg, #f5f2f7 0%, #ece8f0 100%);
+      position: relative;
+    }
+
+    body.dark {
+      background: #1a1620;
+      background-image: radial-gradient(circle at 10% 20%, rgba(80, 50, 100, 0.3) 0%, transparent 35%),
+                        radial-gradient(circle at 90% 80%, rgba(40, 60, 100, 0.3) 0%, transparent 40%),
+                        linear-gradient(145deg, #1a1620 0%, #12101a 100%);
+    }
+
+    .dark-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      background: transparent;
+      transition: background 0.6s ease;
+    }
+
+    body.dark .dark-overlay {
+      background: rgba(29, 25, 35, 0.05);
+    }
+
+    .glow {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 117, 117, 0.3) 0%, rgba(255, 117, 117, 0.15) 30%, rgba(255, 117, 117, 0.05) 60%, transparent 100%);
+      mix-blend-mode: screen;
+      will-change: transform;
+    }
+
+    body.dark .glow {
+      background: radial-gradient(circle, rgba(255, 209, 209, 0.07) 0%, rgba(255, 209, 209, 0.04) 30%, rgba(255, 209, 209, 0.01) 60%, transparent 100%);
+      mix-blend-mode: lighten;
+    }
+
+    .ripple-mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      overflow: hidden;
+      border-radius: 0;
+    }
+
+    .ripple-circle {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: rippleGrow 1.8s ease-out forwards;
+      will-change: transform;
+    }
+
+    .ripple-circle.dark-ripple {
+      background: #1a1620;
+    }
+
+    .ripple-circle.light-ripple {
+      background: #f3f0f5;
+    }
+
+    @keyframes rippleGrow {
+      0% {
+        transform: scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(4.5);
+        opacity: 0;
+      }
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      padding: 1.8rem 2.4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        padding: 1.2rem 1rem;
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      border-bottom: 1.5px solid rgba(60, 40, 80, 0.08);
+      padding-bottom: 1.2rem;
+      position: relative;
+      transition: border-color 0.2s ease;
+    }
+
+    body.dark .header {
+      border-bottom-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .site-title {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(145deg, #281f33, #5a4277);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: background 0.2s ease;
+    }
+
+    body.dark .site-title {
+      background: linear-gradient(145deg, #c9b8e0, #a68bc9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #3f334d;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      z-index: 10;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    body.dark .theme-toggle {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #d4c8e0;
+    }
+
+    body.dark .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 0.6rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #3f334d;
+      transition: 0.15s;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 4px;
+    }
+
+    .nav-links a:hover {
+      color: #1d1129;
+      border-bottom-color: #b8a3d6;
+    }
+
+    body.dark .nav-links a {
+      color: #c4b8d0;
+    }
+
+    body.dark .nav-links a:hover {
+      color: #f0e8f8;
+      border-bottom-color: #a68bc9;
+    }
+
+    @media (max-width: 550px) {
+      .site-title {
+        font-size: 1.8rem;
+      }
+      .nav-links {
+        gap: 1.2rem;
+      }
+      .theme-toggle {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+        top: -4px;
+      }
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+    }
+
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .profile h1 {
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #1d1428;
+      margin-bottom: 0.2rem;
+      line-height: 1.1;
+      transition: color 0.2s ease;
+    }
+
+    body.dark .profile h1 {
+      color: #ece4f5;
+    }
+
+    .profile .title-role {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: #4e3d60;
+      margin-bottom: 0.4rem;
+      opacity: 0.8;
+      transition: color 0.2s ease;
+      line-height: 1.8;
+    }
+
+    body.dark .profile .title-role {
+      color: #b0a0c0;
+    }
+
+    .profile .title-role .dot {
+      display: inline-block;
+      margin: 0 0.3rem;
+    }
+
+    .profile .bio {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #41364b;
+      max-width: 95%;
+      font-weight: 400;
+      margin: 0.6rem 0 1.8rem 0;
+      opacity: 0.85;
+      transition: color 0.2s ease;
+    }
+
+    body.dark .profile .bio {
+      color: #b0a4be;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: #3f334d;
+      font-size: 1.2rem;
+      transition: 0.15s;
+      text-decoration: none;
+      background: transparent;
+      border: none;
+    }
+
+    .social-links a:hover {
+      color: #1d1129;
+      transform: scale(1.1);
+      background: rgba(60, 40, 80, 0.05);
+    }
+
+    body.dark .social-links a {
+      color: #b0a0c0;
+    }
+
+    body.dark .social-links a:hover {
+      color: #f0e8f8;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .contact-card {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 2rem 2.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 12px 32px -12px rgba(40, 20, 60, 0.12);
+      transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s;
+      will-change: background, border-color, box-shadow;
+      backface-visibility: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .contact-card:hover {
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 16px 40px -14px rgba(40, 20, 60, 0.16);
+      transform: translateY(-2px);
+    }
+
+    body.dark .contact-card {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark .contact-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .contact-card .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #281f33;
+      margin-bottom: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: color 0.2s ease;
+    }
+
+    body.dark .contact-card .card-title {
+      color: #d4c8e0;
+    }
+
+    .contact-card .card-title i {
+      color: #4a375d;
+      font-size: 1.3rem;
+      transition: color 0.2s ease;
+    }
+
+    body.dark .contact-card .card-title i {
+      color: #a68bc9;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(60, 40, 80, 0.06);
+      transition: border-color 0.2s ease;
+    }
+
+    body.dark .contact-item {
+      border-bottom-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .contact-item:last-child {
+      border-bottom: none;
+    }
+
+    .contact-item .icon {
+      width: 2.2rem;
+      font-size: 1.2rem;
+      color: #4a375d;
+      text-align: center;
+      flex-shrink: 0;
+      transition: color 0.2s ease;
+    }
+
+    body.dark .contact-item .icon {
+      color: #a68bc9;
+    }
+
+    .contact-item .label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4f405f;
+      width: 4.5rem;
+      flex-shrink: 0;
+      transition: color 0.2s ease;
+    }
+
+    body.dark .contact-item .label {
+      color: #9a8aaa;
+    }
+
+    .contact-item .value {
+      font-size: 0.95rem;
+      color: #1d1428;
+      word-break: break-all;
+      transition: color 0.2s ease;
+    }
+
+    body.dark .contact-item .value {
+      color: #d4c8e0;
+    }
+
+    .contact-item .value a {
+      color: #4a375d;
+      text-decoration: none;
+      transition: 0.15s;
+    }
+
+    .contact-item .value a:hover {
+      color: #1d1129;
+      text-decoration: underline;
+    }
+
+    body.dark .contact-item .value a {
+      color: #a68bc9;
+    }
+
+    body.dark .contact-item .value a:hover {
+      color: #d4c8e0;
+    }
+
+    .footer-note {
+      margin-top: 3.2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #5b4b6b;
+      opacity: 0.6;
+      border-top: 1.5px solid rgba(60, 40, 80, 0.06);
+      padding-top: 1.8rem;
+      letter-spacing: 0.3px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    body.dark .footer-note {
+      color: #7a6a8a;
+      border-top-color: rgba(255, 255, 255, 0.06);
+    }
+
+    @media (max-width: 450px) {
+      .profile h1 {
+        font-size: 2.2rem;
+      }
+      .contact-card {
+        padding: 1.5rem;
+      }
+      .contact-item {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+      }
+      .contact-item .label {
+        width: 100%;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>?</h1>
+  <div class="dark-overlay"></div>
+  <div class="glow" id="glow"></div>
+  <div class="ripple-mask" id="rippleMask"></div>
+
+  <div class="container">
+    <div class="header">
+      <div class="site-title">Zhixie's Page</div>
+      <button class="theme-toggle" id="themeToggle" aria-label="切换深浅色模式">
+        <i class="fas fa-moon"></i>
+      </button>
+      <div class="nav-links">
+        <a href="#"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
+        <a href="#"><i class="fas fa-project-diagram"></i> 项目</a>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="profile">
+        <h1>Zhixie</h1>
+        <div class="title-role">
+          · 最屎屎山代码 2147483647年保持者<br>
+          · 代码续命用佛祖 9223372036854775807年保持者
+        </div>
+        <p class="bio">
+          热爱构建优雅的数字体验，专注前端与交互设计。<br>
+          目前探索 AI 与创意编程的交汇点。
+        </p>
+        <div class="social-links">
+          <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" aria-label="Email"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="card-title">
+          <i class="fas fa-address-card"></i> 联系方式
+        </div>
+
+        <div class="contact-item">
+          <div class="icon"><i class="fas fa-envelope"></i></div>
+          <div class="label">邮箱</div>
+          <div class="value"><a href="mailto:Zuowan123@outlook.com">Zuowan123@outlook.com</a></div>
+        </div>
+
+        <div class="contact-item">
+          <div class="icon"><i class="fab fa-qq"></i></div>
+          <div class="label">QQ</div>
+          <div class="value">2693724184</div>
+        </div>
+
+        <div class="contact-item">
+          <div class="icon"><i class="fab fa-bilibili"></i></div>
+          <div class="label">Bilibili</div>
+          <div class="value"><a href="https://space.bilibili.com/1330332851" target="_blank">space.bilibili.com/1330332851</a></div>
+        </div>
+
+        <div class="contact-item">
+          <div class="icon"><i class="fab fa-github"></i></div>
+          <div class="label">GitHub</div>
+          <div class="value"><a href="https://github.com/uzjhf-836/" target="_blank">github.com/uzjhf-836</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      ©2026 只屑. 保留所有权利。
+    </div>
+  </div>
+
+  <script>
+    const toggleBtn = document.getElementById('themeToggle');
+    const icon = toggleBtn.querySelector('i');
+    const mask = document.getElementById('rippleMask');
+    const glow = document.getElementById('glow');
+
+    document.addEventListener('mousemove', function(e) {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    });
+
+    document.addEventListener('touchmove', function(e) {
+      const touch = e.touches[0];
+      glow.style.left = touch.clientX + 'px';
+      glow.style.top = touch.clientY + 'px';
+    }, { passive: true });
+
+    toggleBtn.addEventListener('click', function(e) {
+      const rect = toggleBtn.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+
+      const isDark = document.body.classList.contains('dark');
+      const rippleColor = isDark ? 'light-ripple' : 'dark-ripple';
+
+      const circle = document.createElement('div');
+      circle.classList.add('ripple-circle', rippleColor);
+      const size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
+      circle.style.width = size + 'px';
+      circle.style.height = size + 'px';
+      circle.style.left = (x - size / 2) + 'px';
+      circle.style.top = (y - size / 2) + 'px';
+      mask.appendChild(circle);
+
+      setTimeout(() => {
+        document.body.classList.toggle('dark');
+        if (document.body.classList.contains('dark')) {
+          icon.className = 'fas fa-sun';
+        } else {
+          icon.className = 'fas fa-moon';
+        }
+      }, 300);
+
+      setTimeout(() => {
+        circle.remove();
+      }, 2100);
+    });
+  </script>
 </body>
 </html>
