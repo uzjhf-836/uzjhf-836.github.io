@@ -96,7 +96,6 @@
       margin-top: 0.8rem;
     }
 
-    /* ===== 设置按钮 ===== */
     .settings-btn {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(8px);
@@ -128,7 +127,7 @@
       background: rgba(255, 255, 255, 0.6);
     }
 
-    /* ===== 下拉菜单 - 横向展开，只有图标 ===== */
+    /* ===== 下拉菜单 ===== */
     .dropdown-menu {
       position: fixed;
       top: 0;
@@ -215,6 +214,14 @@
     .nav-links a:hover { color: #f0e8f8; border-bottom-color: #a68bc9; }
     body.light .nav-links a { color: #3f334d; }
     body.light .nav-links a:hover { color: #1d1129; border-bottom-color: #b8a3d6; }
+
+    .nav-links a.active {
+      border-bottom-color: #a68bc9;
+      color: #ece4f5;
+    }
+    body.light .nav-links a.active {
+      color: #1d1428;
+    }
 
     @media (max-width: 550px) {
       .site-title { font-size: 1.8rem; }
@@ -369,7 +376,6 @@
       gap: 1rem;
     }
 
-    /* ===== 大按钮 ===== */
     .tools-btn-group {
       display: flex;
       gap: 1rem;
@@ -723,7 +729,7 @@
           <i class="fas fa-sliders-h"></i>
         </button>
         <div class="nav-links">
-          <a href="#"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
+          <a href="https://uzjhf-836.github.io/index.html" class="active"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
           <a href="https://uzjhf-836.github.io/project/index.html"><i class="fas fa-project-diagram"></i> 项目</a>
         </div>
       </div>
@@ -790,7 +796,7 @@
     </div>
   </div>
 
-  <!-- 下拉菜单 - 横向展开，只有图标 -->
+  <!-- 下拉菜单 -->
   <div class="dropdown-menu" id="settingsMenu">
     <button class="dropdown-item" id="themeToggle">
       <i class="fas fa-sun" id="themeIcon"></i>
