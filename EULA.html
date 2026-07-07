@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EULA · Zhixie's Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="icon" href="https://uzjhf-836.github.io/sources/w11.png">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'HarmonyOS Sans SC';
+      src: url('https://uzjhf-836.github.io/font/HarmonyOS_Sans_SC_Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      transition: background 1.8s ease, background-image 1.8s ease;
+      background: #1a1620;
+      background-image: radial-gradient(circle at 10% 20%, rgba(80, 50, 100, 0.3) 0%, transparent 35%),
+                        radial-gradient(circle at 90% 80%, rgba(40, 60, 100, 0.3) 0%, transparent 40%),
+                        linear-gradient(145deg, #1a1620 0%, #12101a 100%);
+    }
+
+    body.light {
+      background: #f3f0f5;
+      background-image: radial-gradient(circle at 10% 20%, rgba(235, 215, 250, 0.4) 0%, transparent 35%),
+                        radial-gradient(circle at 90% 80%, rgba(200, 220, 255, 0.4) 0%, transparent 40%),
+                        linear-gradient(145deg, #f5f2f7 0%, #ece8f0 100%);
+    }
+
+    .dark-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      background: transparent;
+      transition: background 0.6s ease;
+    }
+    body.light .dark-overlay { background: rgba(29, 25, 35, 0.05); }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      padding: 1.8rem 2.4rem;
+      position: relative;
+      z-index: 1;
+    }
+    @media (max-width: 700px) { .container { padding: 1.2rem 1rem; } }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1.2rem;
+      transition: border-color 0.2s ease;
+    }
+    body.light .header { border-bottom-color: rgba(60, 40, 80, 0.08); }
+
+    .site-title {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(145deg, #c9b8e0, #a68bc9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: background 0.2s ease;
+      display: inline-block;
+    }
+    body.light .site-title {
+      background: linear-gradient(145deg, #281f33, #5a4277);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-bottom {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+
+    .settings-btn {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: #d4c8e0;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      position: relative;
+      z-index: 100001;
+    }
+    .settings-btn:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.18);
+    }
+    body.light .settings-btn {
+      background: rgba(255, 255, 255, 0.4);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #3f334d;
+    }
+    body.light .settings-btn:hover {
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    /* ===== 下拉菜单 ===== */
+    .dropdown-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(26, 22, 32, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 0.4rem 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.1rem;
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.5);
+      z-index: 999999;
+    }
+    .dropdown-menu.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    body.light .dropdown-menu {
+      background: rgba(243, 240, 245, 0.92);
+      border-color: rgba(60, 40, 80, 0.06);
+    }
+
+    .dropdown-menu .dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 0.7rem;
+      font-size: 1.1rem;
+      font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
+      color: #b0a4be;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, border-radius 0.2s ease;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      min-width: 36px;
+      min-height: 36px;
+    }
+    .dropdown-menu .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ece4f5;
+    }
+    body.light .dropdown-menu .dropdown-item {
+      color: #4f405f;
+    }
+    body.light .dropdown-menu .dropdown-item:hover {
+      background: rgba(60, 40, 80, 0.06);
+      color: #1d1428;
+    }
+
+    .dropdown-menu .dropdown-divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;
+    }
+    body.light .dropdown-menu .dropdown-divider {
+      background: rgba(60, 40, 80, 0.06);
+    }
+
+    @media (max-width: 550px) {
+      .site-title { font-size: 1.8rem; }
+      .header-bottom { gap: 1rem; }
+      .settings-btn { width: 34px; height: 34px; font-size: 0.85rem; }
+      .dropdown-menu { padding: 0.3rem 0.3rem; gap: 0.05rem; }
+      .dropdown-menu .dropdown-item { padding: 0.4rem 0.5rem; font-size: 0.9rem; min-width: 30px; min-height: 30px; }
+      .dropdown-menu .dropdown-divider { height: 18px; }
+    }
+
+    /* ===== 主内容 ===== */
+    .main-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+    }
+
+    /* ===== 卡片 ===== */
+    .card-light {
+      position: relative;
+      overflow: hidden;
+      border-radius: 2rem;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.4);
+      transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s;
+      width: 100%;
+      max-width: 700px;
+      padding: 3rem 2.8rem;
+      min-height: 400px;
+    }
+    .card-light:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 16px 40px -14px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px);
+    }
+    body.light .card-light {
+      background: rgba(255, 255, 255, 0.55);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 12px 32px -12px rgba(40, 20, 60, 0.12);
+    }
+    body.light .card-light:hover {
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 16px 40px -14px rgba(40, 20, 60, 0.16);
+      transform: translateY(-2px);
+    }
+
+    .card-light .card-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ece4f5;
+      margin-bottom: 1.5rem;
+      transition: color 0.2s ease;
+      text-align: center;
+    }
+    body.light .card-light .card-title {
+      color: #1d1428;
+    }
+
+    .card-light .card-content {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #b0a4be;
+      transition: color 0.2s ease;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    body.light .card-light .card-content {
+      color: #4f405f;
+    }
+
+    /* ===== 光效 ===== */
+    .card-light .light {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(circle 200px at var(--x, 50%) var(--y, 50%), rgba(255, 209, 209, 0.35) 0%, rgba(255, 209, 209, 0.12) 30%, transparent 60%);
+      mix-blend-mode: screen;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: inherit;
+      background-repeat: no-repeat;
+    }
+    body.light .card-light .light {
+      background: radial-gradient(circle 200px at var(--x, 50%) var(--y, 50%), rgba(255, 209, 209, 0.5) 0%, rgba(255, 209, 209, 0.2) 30%, transparent 60%);
+    }
+    .card-light .light.show {
+      opacity: 1;
+    }
+
+    .card-light > *:not(.light) {
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-note {
+      margin-top: 3.2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #7a6a8a;
+      opacity: 0.6;
+      border-top: 1.5px solid rgba(255, 255, 255, 0.06);
+      padding-top: 1.8rem;
+      letter-spacing: 0.3px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    body.light .footer-note { color: #5b4b6b; border-top-color: rgba(60, 40, 80, 0.06); }
+
+    @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+    .fade-in { opacity: 0; animation: fadeIn 0.8s ease forwards; }
+    .fade-in-1 { animation-delay: 0.1s; }
+    .fade-in-2 { animation-delay: 0.2s; }
+    .fade-in-3 { animation-delay: 0.3s; }
+    .fade-in-4 { animation-delay: 0.4s; }
+    .fade-in-5 { animation-delay: 0.5s; }
+    .fade-in-6 { animation-delay: 0.6s; }
+
+    .ripple-mask {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      overflow: hidden;
+      border-radius: 0;
+    }
+    .ripple-circle {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: rippleGrow 1.8s ease-out forwards;
+      will-change: transform;
+    }
+    .ripple-circle.dark-ripple { background: #1a1620; }
+    .ripple-circle.light-ripple { background: #f3f0f5; }
+    @keyframes rippleGrow {
+      0% { transform: scale(0); opacity: 1; }
+      100% { transform: scale(4.5); opacity: 0; }
+    }
+
+    /* ===== Cookie 弹窗 ===== */
+    .cookie-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 99999;
+      background: rgba(26, 22, 32, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 1.5rem 2rem;
+      transition: opacity 0.6s ease;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    body.light .cookie-banner {
+      background: rgba(243, 240, 245, 0.92);
+      border-top-color: rgba(60, 40, 80, 0.08);
+    }
+    .cookie-banner.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .cookie-banner.hidden {
+      display: none;
+    }
+
+    .cookie-banner .cookie-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .cookie-banner .cookie-text {
+      font-size: 0.9rem;
+      color: #b0a4be;
+      flex: 1;
+      min-width: 200px;
+      line-height: 1.6;
+    }
+    body.light .cookie-banner .cookie-text {
+      color: #4f405f;
+    }
+    .cookie-banner .cookie-text strong {
+      color: #d4c8e0;
+      font-weight: 600;
+    }
+    body.light .cookie-banner .cookie-text strong {
+      color: #281f33;
+    }
+
+    .cookie-banner .cookie-buttons {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .cookie-banner .cookie-btn {
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
+      cursor: pointer;
+      transition: 0.25s ease;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.06);
+      color: #b0a4be;
+      user-select: none;
+    }
+    .cookie-banner .cookie-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.12);
+      color: #d4c8e0;
+    }
+    .cookie-banner .cookie-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    body.light .cookie-banner .cookie-btn {
+      background: rgba(60, 40, 80, 0.06);
+      color: #4f405f;
+    }
+    body.light .cookie-banner .cookie-btn:hover:not(:disabled) {
+      background: rgba(60, 40, 80, 0.12);
+      color: #1d1428;
+    }
+
+    .cookie-banner .cookie-btn.primary {
+      background: rgba(166, 139, 201, 0.2);
+      color: #c9b8e0;
+      border-color: rgba(166, 139, 201, 0.15);
+    }
+    .cookie-banner .cookie-btn.primary:hover:not(:disabled) {
+      background: rgba(166, 139, 201, 0.35);
+      color: #ece4f5;
+    }
+    body.light .cookie-banner .cookie-btn.primary {
+      background: rgba(90, 66, 119, 0.08);
+      color: #4a375d;
+      border-color: rgba(90, 66, 119, 0.1);
+    }
+    body.light .cookie-banner .cookie-btn.primary:hover:not(:disabled) {
+      background: rgba(90, 66, 119, 0.18);
+      color: #1d1428;
+    }
+
+    .cookie-banner .cookie-btn.reject {
+      background: transparent;
+      color: #7a6a8a;
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    .cookie-banner .cookie-btn.reject:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.06);
+      color: #b0a4be;
+    }
+    body.light .cookie-banner .cookie-btn.reject {
+      color: #8a7a9a;
+      border-color: rgba(60, 40, 80, 0.08);
+    }
+    body.light .cookie-banner .cookie-btn.reject:hover:not(:disabled) {
+      background: rgba(60, 40, 80, 0.06);
+      color: #4f405f;
+    }
+
+    @media (max-width: 700px) {
+      .cookie-banner {
+        padding: 1.2rem 1.2rem;
+      }
+      .cookie-banner .cookie-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+      }
+      .cookie-banner .cookie-text {
+        font-size: 0.8rem;
+      }
+      .cookie-banner .cookie-buttons {
+        justify-content: center;
+      }
+      .cookie-banner .cookie-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+      }
+      .card-light {
+        padding: 2rem 1.5rem;
+        min-height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dark-overlay fade-in fade-in-1"></div>
+  <div class="ripple-mask" id="rippleMask"></div>
+
+  <div class="container">
+    <div class="header fade-in fade-in-1">
+      <div class="site-title">Zhixie's Page</div>
+      <div class="header-bottom">
+        <button class="settings-btn" id="settingsBtn" aria-label="设置">
+          <i class="fas fa-sliders-h"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="card-light fade-in fade-in-2" data-card>
+        <div class="light" id="light1"></div>
+        <script>
+  var eulaMD = `
+# 最终用户许可协议
+
+**最后更新日期：** 2026年7月7日
+
+---
+
+## 1. 许可范围
+
+本协议允许你...
+
+## 2. 使用限制
+
+- 不得...
+- 不得...
+
+## 3. 免责声明
+
+本软件按"现状"提供...
+`;
+
+  document.getElementById('eulaContent').innerHTML = marked.parse(eulaMD);
+</script>
+      </div>
+    </div>
+
+    <div class="footer-note fade-in fade-in-3">
+      ©2026 只屑. 保留所有权利。
+    </div>
+  </div>
+
+  <!-- 下拉菜单 -->
+  <div class="dropdown-menu" id="settingsMenu">
+    <button class="dropdown-item" id="themeToggle">
+      <i class="fas fa-sun" id="themeIcon"></i>
+    </button>
+    <div class="dropdown-divider"></div>
+    <button class="dropdown-item" id="cookieSettingsBtn">
+      <i class="fas fa-cookie-bite"></i>
+    </button>
+  </div>
+
+  <!-- Cookie 弹窗 -->
+  <div class="cookie-banner" id="cookieBanner">
+    <div class="cookie-inner">
+      <div class="cookie-text">
+        <strong>Cookies:</strong><br> 我们使用 Cookies 以为你提供个性化体验或广告服务(当然我肯定不会搞广告)，不会上传到服务器
+      </div>
+      <div class="cookie-buttons">
+        <button class="cookie-btn primary" data-choice="all">接受所有 Cookies</button>
+        <button class="cookie-btn" data-choice="necessary">仅接受必要 Cookies</button>
+        <button class="cookie-btn reject" data-choice="none">不接受 Cookies</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var COOKIE_MAX_AGE = 36500;
+
+    function setCookie(name, value) {
+      var expires = new Date(Date.now() + COOKIE_MAX_AGE * 864e5).toUTCString();
+      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+    }
+
+    function getCookie(name) {
+      var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+
+    function clearAllCookies() {
+      document.cookie.split(';').forEach(function(c) {
+        var name = c.split('=')[0].trim();
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      });
+    }
+
+    var banner = document.getElementById('cookieBanner');
+    var settingsBtn = document.getElementById('settingsBtn');
+    var settingsMenu = document.getElementById('settingsMenu');
+    var themeToggle = document.getElementById('themeToggle');
+    var themeIcon = document.getElementById('themeIcon');
+    var cookieSettingsBtn = document.getElementById('cookieSettingsBtn');
+    var mask = document.getElementById('rippleMask');
+    var body = document.body;
+    var isProcessing = false;
+    var activeCard = null;
+    var consent = getCookie('cookie_consent');
+    var menuOpen = false;
+
+    function updateMenuPosition() {
+      var rect = settingsBtn.getBoundingClientRect();
+      settingsMenu.style.top = (rect.bottom + 8) + 'px';
+      settingsMenu.style.left = (rect.right - settingsMenu.offsetWidth) + 'px';
+    }
+
+    settingsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      menuOpen = !menuOpen;
+      if (menuOpen) {
+        updateMenuPosition();
+        settingsMenu.classList.add('open');
+      } else {
+        settingsMenu.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('click', function() {
+      if (menuOpen) {
+        menuOpen = false;
+        settingsMenu.classList.remove('open');
+      }
+    });
+
+    window.addEventListener('resize', function() {
+      if (menuOpen) {
+        updateMenuPosition();
+      }
+    });
+
+    window.addEventListener('scroll', function() {
+      if (menuOpen) {
+        updateMenuPosition();
+      }
+    });
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        body.classList.add('light');
+        themeIcon.className = 'fas fa-moon';
+      } else {
+        body.classList.remove('light');
+        themeIcon.className = 'fas fa-sun';
+      }
+    }
+
+    function toggleTheme() {
+      if (!getCookie('cookie_consent')) return;
+      if (isProcessing) return;
+
+      var rect = settingsBtn.getBoundingClientRect();
+      var x = rect.left + rect.width / 2;
+      var y = rect.top + rect.height / 2;
+
+      var isLight = body.classList.contains('light');
+      var rippleColor = isLight ? 'dark-ripple' : 'light-ripple';
+
+      var circle = document.createElement('div');
+      circle.classList.add('ripple-circle', rippleColor);
+      var size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
+      circle.style.width = size + 'px';
+      circle.style.height = size + 'px';
+      circle.style.left = (x - size / 2) + 'px';
+      circle.style.top = (y - size / 2) + 'px';
+      mask.appendChild(circle);
+
+      setTimeout(function() {
+        var newTheme = isLight ? 'dark' : 'light';
+        applyTheme(newTheme);
+        if (getCookie('cookie_consent') === 'all') {
+          setCookie('theme', newTheme);
+        }
+      }, 150);
+
+      setTimeout(function() { circle.remove(); }, 2100);
+    }
+
+    if (consent) {
+      banner.classList.add('hidden');
+      var savedTheme = getCookie('theme');
+      if (savedTheme === 'light') {
+        applyTheme('light');
+      } else {
+        applyTheme('dark');
+      }
+    } else {
+      applyTheme('dark');
+    }
+
+    themeToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!getCookie('cookie_consent')) return;
+      toggleTheme();
+      menuOpen = false;
+      settingsMenu.classList.remove('open');
+    });
+
+    cookieSettingsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showCookieBanner();
+      menuOpen = false;
+      settingsMenu.classList.remove('open');
+    });
+
+    document.querySelectorAll('[data-card]').forEach(function(card) {
+      var light = card.querySelector('.light');
+
+      card.addEventListener('mouseenter', function() {
+        light.classList.add('show');
+        activeCard = card;
+      });
+
+      card.addEventListener('mousemove', function(e) {
+        if (activeCard !== card) return;
+        var rect = card.getBoundingClientRect();
+        var x = ((e.clientX - rect.left) / rect.width) * 100;
+        var y = ((e.clientY - rect.top) / rect.height) * 100;
+        light.style.setProperty('--x', x + '%');
+        light.style.setProperty('--y', y + '%');
+      });
+
+      card.addEventListener('mouseleave', function() {
+        if (activeCard === card) {
+          light.classList.remove('show');
+          activeCard = null;
+        }
+      });
+    });
+
+    function showCookieBanner() {
+      banner.classList.remove('hidden', 'fade-out');
+      banner.style.display = '';
+      document.querySelectorAll('.cookie-btn').forEach(function(b) {
+        b.disabled = false;
+      });
+      isProcessing = false;
+    }
+
+    document.querySelectorAll('.cookie-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (isProcessing) return;
+
+        var choice = this.dataset.choice;
+        var allBtns = document.querySelectorAll('.cookie-btn');
+
+        allBtns.forEach(function(b) { b.disabled = true; });
+        isProcessing = true;
+
+        banner.classList.add('fade-out');
+
+        setTimeout(function() {
+          clearAllCookies();
+
+          if (choice === 'all') {
+            setCookie('cookie_consent', 'all');
+            var isLight = body.classList.contains('light');
+            setCookie('theme', isLight ? 'light' : 'dark');
+          } else if (choice === 'necessary') {
+            setCookie('cookie_consent', 'necessary');
+            applyTheme('dark');
+          } else {
+            setCookie('cookie_consent', 'none');
+            applyTheme('dark');
+          }
+
+          banner.classList.add('hidden');
+          isProcessing = false;
+          allBtns.forEach(function(b) { b.disabled = false; });
+        }, 700);
+      });
+    });
+  </script>
+</body>
+</html>
