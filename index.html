@@ -87,14 +87,22 @@
       background-clip: text;
     }
 
-    .theme-toggle {
+    .header-buttons {
       position: absolute;
-      top: 0; right: 0;
+      top: 0;
+      right: 0;
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .theme-toggle, .cookie-settings-btn {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 50%;
-      width: 44px; height: 44px;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -105,13 +113,22 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
       z-index: 10;
     }
-    .theme-toggle:hover { transform: scale(1.05); background: rgba(255, 255, 255, 0.18); }
-    body.light .theme-toggle {
+    .theme-toggle:hover, .cookie-settings-btn:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.18);
+    }
+    body.light .theme-toggle, body.light .cookie-settings-btn {
       background: rgba(255, 255, 255, 0.4);
       border-color: rgba(255, 255, 255, 0.3);
       color: #3f334d;
     }
-    body.light .theme-toggle:hover { background: rgba(255, 255, 255, 0.6); }
+    body.light .theme-toggle:hover, body.light .cookie-settings-btn:hover {
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .cookie-settings-btn {
+      font-size: 1.1rem;
+    }
 
     .nav-links {
       display: flex;
@@ -137,7 +154,8 @@
     @media (max-width: 550px) {
       .site-title { font-size: 1.8rem; }
       .nav-links { gap: 1.2rem; }
-      .theme-toggle { width: 38px; height: 38px; font-size: 1rem; top: -4px; }
+      .theme-toggle, .cookie-settings-btn { width: 38px; height: 38px; font-size: 1rem; top: -4px; }
+      .cookie-settings-btn { font-size: 0.9rem; }
     }
 
     .main-grid {
@@ -583,9 +601,14 @@
   <div class="container">
     <div class="header fade-in fade-in-1">
       <div class="site-title">Zhixie's Page</div>
-      <button class="theme-toggle" id="themeToggle" aria-label="切换深浅色模式">
-        <i class="fas fa-sun"></i>
-      </button>
+      <div class="header-buttons">
+        <button class="theme-toggle" id="themeToggle" aria-label="切换深浅色模式">
+          <i class="fas fa-sun"></i>
+        </button>
+        <button class="cookie-settings-btn" id="cookieSettingsBtn" aria-label="Cookie 设置">
+          <i class="fas fa-cookie-bite"></i>
+        </button>
+      </div>
       <div class="nav-links">
         <a href="#"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
         <a href="#"><i class="fas fa-project-diagram"></i> 项目</a>
@@ -667,7 +690,6 @@
 
   <script>
     // ===== Cookie 工具函数 =====
-    // 100年 = 36500 天
     var COOKIE_MAX_AGE = 36500;
 
     function setCookie(name, value) {
@@ -682,6 +704,7 @@
 
     var banner = document.getElementById('cookieBanner');
     var toggleBtn = document.getElementById('themeToggle');
+    var settingsBtn = document.getElementById('cookieSettingsBtn');
     var icon = toggleBtn.querySelector('i');
     var mask = document.getElementById('rippleMask');
     var body = document.body;
@@ -736,6 +759,17 @@
       });
     });
 
+    // ===== 显示 Cookie 弹窗（供设置按钮调用） =====
+    function showCookieBanner() {
+      banner.classList.remove('hidden', 'fade-out');
+      banner.style.display = '';
+      // 重置按钮状态
+      document.querySelectorAll('.cookie-btn').forEach(function(b) {
+        b.disabled = false;
+      });
+      isProcessing = false;
+    }
+
     // ===== Cookie 弹窗按钮 =====
     document.querySelectorAll('.cookie-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -747,7 +781,6 @@
         allBtns.forEach(function(b) { b.disabled = true; });
         isProcessing = true;
 
-        // 弹窗淡出
         banner.classList.add('fade-out');
 
         setTimeout(function() {
@@ -769,7 +802,12 @@
       });
     });
 
-    // ===== 主题切换（只在有 consent 时才存） =====
+    // ===== 🍪 饼干按钮：重新打开 Cookie 设置 =====
+    settingsBtn.addEventListener('click', function() {
+      showCookieBanner();
+    });
+
+    // ===== 主题切换 =====
     toggleBtn.addEventListener('click', function(e) {
       if (!getCookie('cookie_consent')) return;
       if (isProcessing) return;
