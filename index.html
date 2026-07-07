@@ -147,7 +147,7 @@
       pointer-events: none;
       transition: opacity 0.25s ease, transform 0.25s ease;
       box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.5);
-      z-index: 100;
+      z-index: 99999;
     }
     .settings-dropdown .dropdown-menu.open {
       opacity: 1;
@@ -734,7 +734,7 @@
           </button>
           <div class="dropdown-menu" id="settingsMenu">
             <button class="dropdown-item" id="themeToggle">
-              <i class="fas fa-moon" id="themeIcon"></i> 切换深浅色
+              <i class="fas fa-sun" id="themeIcon"></i> 切换深浅色
             </button>
             <div class="dropdown-divider"></div>
             <button class="dropdown-item" id="cookieSettingsBtn">
@@ -872,27 +872,47 @@
       }
     });
 
-    // ===== 主题切换 =====
+    // ===== 应用主题 =====
     function applyTheme(theme) {
       if (theme === 'light') {
         body.classList.add('light');
-        themeIcon.className = 'fas fa-sun';
+        themeIcon.className = 'fas fa-moon';
       } else {
         body.classList.remove('light');
-        themeIcon.className = 'fas fa-moon';
+        themeIcon.className = 'fas fa-sun';
       }
     }
 
+    // ===== 切换主题 + 扩散动画 =====
     function toggleTheme() {
       if (!getCookie('cookie_consent')) return;
       if (isProcessing) return;
 
+      var rect = settingsBtn.getBoundingClientRect();
+      var x = rect.left + rect.width / 2;
+      var y = rect.top + rect.height / 2;
+
       var isLight = body.classList.contains('light');
-      var newTheme = isLight ? 'dark' : 'light';
-      applyTheme(newTheme);
-      if (getCookie('cookie_consent') === 'all') {
-        setCookie('theme', newTheme);
-      }
+      var rippleColor = isLight ? 'dark-ripple' : 'light-ripple';
+
+      var circle = document.createElement('div');
+      circle.classList.add('ripple-circle', rippleColor);
+      var size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
+      circle.style.width = size + 'px';
+      circle.style.height = size + 'px';
+      circle.style.left = (x - size / 2) + 'px';
+      circle.style.top = (y - size / 2) + 'px';
+      mask.appendChild(circle);
+
+      setTimeout(function() {
+        var newTheme = isLight ? 'dark' : 'light';
+        applyTheme(newTheme);
+        if (getCookie('cookie_consent') === 'all') {
+          setCookie('theme', newTheme);
+        }
+      }, 150);
+
+      setTimeout(function() { circle.remove(); }, 2100);
     }
 
     // ===== 恢复主题 =====
@@ -913,7 +933,6 @@
       e.stopPropagation();
       if (!getCookie('cookie_consent')) return;
       toggleTheme();
-      // 关菜单
       menuOpen = false;
       settingsMenu.classList.remove('open');
     });
