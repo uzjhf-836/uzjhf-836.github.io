@@ -667,9 +667,11 @@
 
   <script>
     // ===== Cookie 工具函数 =====
-    function setCookie(name, value, days) {
-      days = days || 365;
-      var expires = new Date(Date.now() + days * 864e5).toUTCString();
+    // 100年 = 36500 天
+    var COOKIE_MAX_AGE = 36500;
+
+    function setCookie(name, value) {
+      var expires = new Date(Date.now() + COOKIE_MAX_AGE * 864e5).toUTCString();
       document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
     }
 
@@ -745,7 +747,7 @@
         allBtns.forEach(function(b) { b.disabled = true; });
         isProcessing = true;
 
-        // 弹窗淡出（不上移）
+        // 弹窗淡出
         banner.classList.add('fade-out');
 
         setTimeout(function() {
