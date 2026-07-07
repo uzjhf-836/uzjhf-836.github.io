@@ -96,12 +96,7 @@
       margin-top: 0.8rem;
     }
 
-    /* ===== 设置下拉菜单 ===== */
-    .settings-dropdown {
-      position: relative;
-      display: inline-block;
-    }
-
+    /* ===== 设置按钮 ===== */
     .settings-btn {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(8px);
@@ -117,6 +112,8 @@
       cursor: pointer;
       transition: 0.3s;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      position: relative;
+      z-index: 100001;
     }
     .settings-btn:hover {
       transform: scale(1.05);
@@ -131,10 +128,11 @@
       background: rgba(255, 255, 255, 0.6);
     }
 
-    .settings-dropdown .dropdown-menu {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
+    /* ===== 下拉菜单 - fixed 定位在 body 层 ===== */
+    .dropdown-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
       background: rgba(26, 22, 32, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -147,19 +145,19 @@
       pointer-events: none;
       transition: opacity 0.25s ease, transform 0.25s ease;
       box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.5);
-      z-index: 99999;
+      z-index: 999999;
     }
-    .settings-dropdown .dropdown-menu.open {
+    .dropdown-menu.open {
       opacity: 1;
       transform: translateY(0) scale(1);
       pointer-events: auto;
     }
-    body.light .settings-dropdown .dropdown-menu {
+    body.light .dropdown-menu {
       background: rgba(243, 240, 245, 0.92);
       border-color: rgba(60, 40, 80, 0.06);
     }
 
-    .settings-dropdown .dropdown-item {
+    .dropdown-menu .dropdown-item {
       display: flex;
       align-items: center;
       gap: 0.6rem;
@@ -175,29 +173,29 @@
       width: 100%;
       text-align: left;
     }
-    .settings-dropdown .dropdown-item:hover {
+    .dropdown-menu .dropdown-item:hover {
       background: rgba(255, 255, 255, 0.06);
       color: #ece4f5;
     }
-    .settings-dropdown .dropdown-item i {
+    .dropdown-menu .dropdown-item i {
       width: 1.2rem;
       text-align: center;
       font-size: 1rem;
     }
-    body.light .settings-dropdown .dropdown-item {
+    body.light .dropdown-menu .dropdown-item {
       color: #4f405f;
     }
-    body.light .settings-dropdown .dropdown-item:hover {
+    body.light .dropdown-menu .dropdown-item:hover {
       background: rgba(60, 40, 80, 0.06);
       color: #1d1428;
     }
 
-    .settings-dropdown .dropdown-divider {
+    .dropdown-menu .dropdown-divider {
       height: 1px;
       margin: 0.3rem 0.8rem;
       background: rgba(255, 255, 255, 0.06);
     }
-    body.light .settings-dropdown .dropdown-divider {
+    body.light .dropdown-menu .dropdown-divider {
       background: rgba(60, 40, 80, 0.06);
     }
 
@@ -225,14 +223,8 @@
       .header-bottom { gap: 1rem; }
       .nav-links { gap: 1.2rem; }
       .settings-btn { width: 34px; height: 34px; font-size: 0.85rem; }
-      .settings-dropdown .dropdown-menu {
-        min-width: 140px;
-        right: -8px;
-      }
-      .settings-dropdown .dropdown-item {
-        padding: 0.5rem 1rem;
-        font-size: 0.8rem;
-      }
+      .dropdown-menu { min-width: 140px; }
+      .dropdown-menu .dropdown-item { padding: 0.5rem 1rem; font-size: 0.8rem; }
     }
 
     .main-grid {
@@ -728,20 +720,9 @@
     <div class="header fade-in fade-in-1">
       <div class="site-title">Zhixie's Page</div>
       <div class="header-bottom">
-        <div class="settings-dropdown">
-          <button class="settings-btn" id="settingsBtn" aria-label="设置">
-            <i class="fas fa-sliders-h"></i>
-          </button>
-          <div class="dropdown-menu" id="settingsMenu">
-            <button class="dropdown-item" id="themeToggle">
-              <i class="fas fa-sun" id="themeIcon"></i> 切换深浅色
-            </button>
-            <div class="dropdown-divider"></div>
-            <button class="dropdown-item" id="cookieSettingsBtn">
-              <i class="fas fa-cookie-bite"></i> Cookie 设置
-            </button>
-          </div>
-        </div>
+        <button class="settings-btn" id="settingsBtn" aria-label="设置">
+          <i class="fas fa-sliders-h"></i>
+        </button>
         <div class="nav-links">
           <a href="#"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
           <a href="#"><i class="fas fa-project-diagram"></i> 项目</a>
@@ -810,6 +791,17 @@
     </div>
   </div>
 
+  <!-- 下拉菜单 - fixed 定位在 body 层 -->
+  <div class="dropdown-menu" id="settingsMenu">
+    <button class="dropdown-item" id="themeToggle">
+      <i class="fas fa-sun" id="themeIcon"></i> 切换深浅色
+    </button>
+    <div class="dropdown-divider"></div>
+    <button class="dropdown-item" id="cookieSettingsBtn">
+      <i class="fas fa-cookie-bite"></i> Cookie 设置
+    </button>
+  </div>
+
   <!-- Cookie 弹窗 -->
   <div class="cookie-banner" id="cookieBanner">
     <div class="cookie-inner">
@@ -858,17 +850,41 @@
     var consent = getCookie('cookie_consent');
     var menuOpen = false;
 
-    // ===== 下拉菜单 =====
+    // ===== 下拉菜单位置计算 =====
+    function updateMenuPosition() {
+      var rect = settingsBtn.getBoundingClientRect();
+      settingsMenu.style.top = (rect.bottom + 8) + 'px';
+      settingsMenu.style.left = (rect.right - 160) + 'px';
+    }
+
+    // ===== 下拉菜单开关 =====
     settingsBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       menuOpen = !menuOpen;
-      settingsMenu.classList.toggle('open', menuOpen);
+      if (menuOpen) {
+        updateMenuPosition();
+        settingsMenu.classList.add('open');
+      } else {
+        settingsMenu.classList.remove('open');
+      }
     });
 
     document.addEventListener('click', function() {
       if (menuOpen) {
         menuOpen = false;
         settingsMenu.classList.remove('open');
+      }
+    });
+
+    window.addEventListener('resize', function() {
+      if (menuOpen) {
+        updateMenuPosition();
+      }
+    });
+
+    window.addEventListener('scroll', function() {
+      if (menuOpen) {
+        updateMenuPosition();
       }
     });
 
