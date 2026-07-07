@@ -65,7 +65,6 @@
       margin-bottom: 3rem;
       border-bottom: 1.5px solid rgba(255, 255, 255, 0.08);
       padding-bottom: 1.2rem;
-      position: relative;
       transition: border-color 0.2s ease;
     }
     body.light .header { border-bottom-color: rgba(60, 40, 80, 0.08); }
@@ -79,6 +78,7 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       transition: background 0.2s ease;
+      display: inline-block;
     }
     body.light .site-title {
       background: linear-gradient(145deg, #281f33, #5a4277);
@@ -87,56 +87,125 @@
       background-clip: text;
     }
 
-    .header-buttons {
-      position: absolute;
-      top: 0;
-      right: 0;
+    .header-bottom {
       display: flex;
-      gap: 0.6rem;
+      justify-content: center;
       align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
     }
 
-    .theme-toggle, .cookie-settings-btn {
+    /* ===== 设置下拉菜单 ===== */
+    .settings-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .settings-btn {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 50%;
-      width: 44px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1rem;
       color: #d4c8e0;
       cursor: pointer;
       transition: 0.3s;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-      z-index: 10;
     }
-    .theme-toggle:hover, .cookie-settings-btn:hover {
+    .settings-btn:hover {
       transform: scale(1.05);
       background: rgba(255, 255, 255, 0.18);
     }
-    body.light .theme-toggle, body.light .cookie-settings-btn {
+    body.light .settings-btn {
       background: rgba(255, 255, 255, 0.4);
       border-color: rgba(255, 255, 255, 0.3);
       color: #3f334d;
     }
-    body.light .theme-toggle:hover, body.light .cookie-settings-btn:hover {
+    body.light .settings-btn:hover {
       background: rgba(255, 255, 255, 0.6);
     }
 
-    .cookie-settings-btn {
-      font-size: 1.1rem;
+    .settings-dropdown .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: rgba(26, 22, 32, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 0.5rem 0;
+      min-width: 160px;
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+    }
+    .settings-dropdown .dropdown-menu.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    body.light .settings-dropdown .dropdown-menu {
+      background: rgba(243, 240, 245, 0.92);
+      border-color: rgba(60, 40, 80, 0.06);
+    }
+
+    .settings-dropdown .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
+      color: #b0a4be;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+    .settings-dropdown .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ece4f5;
+    }
+    .settings-dropdown .dropdown-item i {
+      width: 1.2rem;
+      text-align: center;
+      font-size: 1rem;
+    }
+    body.light .settings-dropdown .dropdown-item {
+      color: #4f405f;
+    }
+    body.light .settings-dropdown .dropdown-item:hover {
+      background: rgba(60, 40, 80, 0.06);
+      color: #1d1428;
+    }
+
+    .settings-dropdown .dropdown-divider {
+      height: 1px;
+      margin: 0.3rem 0.8rem;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    body.light .settings-dropdown .dropdown-divider {
+      background: rgba(60, 40, 80, 0.06);
     }
 
     .nav-links {
       display: flex;
-      justify-content: center;
       gap: 2rem;
       align-items: center;
       flex-wrap: wrap;
-      margin-top: 0.6rem;
     }
     .nav-links a {
       text-decoration: none;
@@ -153,9 +222,17 @@
 
     @media (max-width: 550px) {
       .site-title { font-size: 1.8rem; }
+      .header-bottom { gap: 1rem; }
       .nav-links { gap: 1.2rem; }
-      .theme-toggle, .cookie-settings-btn { width: 38px; height: 38px; font-size: 1rem; top: -4px; }
-      .cookie-settings-btn { font-size: 0.9rem; }
+      .settings-btn { width: 34px; height: 34px; font-size: 0.85rem; }
+      .settings-dropdown .dropdown-menu {
+        min-width: 140px;
+        right: -8px;
+      }
+      .settings-dropdown .dropdown-item {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+      }
     }
 
     .main-grid {
@@ -298,22 +375,64 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 1rem;
     }
-    .tools-card .placeholder-icon {
-      font-size: 2.5rem;
-      color: #a68bc9;
-      opacity: 0.15;
-      transition: color 0.2s ease;
+
+    /* ===== 大按钮 ===== */
+    .tools-btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
     }
-    body.light .tools-card .placeholder-icon { color: #4a375d; opacity: 0.2; }
-    .tools-card .placeholder-sub {
-      font-size: 0.85rem;
-      color: #a68bc9;
-      opacity: 0.2;
-      transition: color 0.2s ease;
+
+    .tools-btn {
+      padding: 1rem 3rem;
+      border-radius: 40px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: #b0a4be;
+      text-decoration: none;
+      display: inline-block;
+      user-select: none;
     }
-    body.light .tools-card .placeholder-sub { color: #4a375d; opacity: 0.25; }
+    .tools-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ece4f5;
+    }
+    body.light .tools-btn {
+      border-color: rgba(60, 40, 80, 0.08);
+      background: rgba(60, 40, 80, 0.04);
+      color: #4f405f;
+    }
+    body.light .tools-btn:hover {
+      background: rgba(60, 40, 80, 0.1);
+      color: #1d1428;
+    }
+
+    .tools-btn.primary-btn {
+      border-color: rgba(166, 139, 201, 0.2);
+      background: rgba(166, 139, 201, 0.08);
+      color: #c9b8e0;
+    }
+    .tools-btn.primary-btn:hover {
+      background: rgba(166, 139, 201, 0.2);
+      color: #ece4f5;
+    }
+    body.light .tools-btn.primary-btn {
+      border-color: rgba(90, 66, 119, 0.1);
+      background: rgba(90, 66, 119, 0.05);
+      color: #4a375d;
+    }
+    body.light .tools-btn.primary-btn:hover {
+      background: rgba(90, 66, 119, 0.12);
+      color: #1d1428;
+    }
 
     .contact-card { padding: 2rem 2.2rem; }
     .contact-card .card-title {
@@ -406,6 +525,13 @@
       }
       body.light .card-light .light {
         background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 209, 209, 0.5) 0%, rgba(255, 209, 209, 0.2) 30%, transparent 60%);
+      }
+      .tools-btn {
+        padding: 0.8rem 2rem;
+        font-size: 0.95rem;
+      }
+      .tools-btn-group {
+        gap: 0.6rem;
       }
     }
 
@@ -601,17 +727,25 @@
   <div class="container">
     <div class="header fade-in fade-in-1">
       <div class="site-title">Zhixie's Page</div>
-      <div class="header-buttons">
-        <button class="theme-toggle" id="themeToggle" aria-label="切换深浅色模式">
-          <i class="fas fa-sun"></i>
-        </button>
-        <button class="cookie-settings-btn" id="cookieSettingsBtn" aria-label="Cookie 设置">
-          <i class="fas fa-cookie-bite"></i>
-        </button>
-      </div>
-      <div class="nav-links">
-        <a href="#"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
-        <a href="#"><i class="fas fa-project-diagram"></i> 项目</a>
+      <div class="header-bottom">
+        <div class="settings-dropdown">
+          <button class="settings-btn" id="settingsBtn" aria-label="设置">
+            <i class="fas fa-sliders-h"></i>
+          </button>
+          <div class="dropdown-menu" id="settingsMenu">
+            <button class="dropdown-item" id="themeToggle">
+              <i class="fas fa-moon" id="themeIcon"></i> 切换深浅色
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" id="cookieSettingsBtn">
+              <i class="fas fa-cookie-bite"></i> Cookie 设置
+            </button>
+          </div>
+        </div>
+        <div class="nav-links">
+          <a href="#"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
+          <a href="#"><i class="fas fa-project-diagram"></i> 项目</a>
+        </div>
       </div>
     </div>
 
@@ -631,10 +765,12 @@
           <div class="light" id="light2"></div>
           <div class="tools-title">MyTools</div>
           <div class="tools-sub">NEW VER</div>
-          <div class="tools-version">1.5.2/1.5.2winUI3 beta1</div>
+          <div class="tools-version">1.5.1 / 1.5.2winUI3 beta1</div>
           <div class="tools-content">
-            <div class="placeholder-icon"><i class="fas fa-tools"></i></div>
-            <div class="placeholder-sub">正在建设中...</div>
+            <div class="tools-btn-group">
+              <a href="https://github.com/uzjhf-836/MyTools/releases/tag/v1.5.1" target="_blank" class="tools-btn primary-btn">MyTools</a>
+              <a href="https://github.com/uzjhf-836/MyTools_winUI3/releases/tag/v1.5.2b1" target="_blank" class="tools-btn">MyToolsWinUI3</a>
+            </div>
           </div>
         </div>
       </div>
@@ -702,7 +838,6 @@
       return match ? decodeURIComponent(match[2]) : null;
     }
 
-    // ===== 清空所有 Cookie =====
     function clearAllCookies() {
       document.cookie.split(';').forEach(function(c) {
         var name = c.split('=')[0].trim();
@@ -711,34 +846,85 @@
     }
 
     var banner = document.getElementById('cookieBanner');
-    var toggleBtn = document.getElementById('themeToggle');
-    var settingsBtn = document.getElementById('cookieSettingsBtn');
-    var icon = toggleBtn.querySelector('i');
+    var settingsBtn = document.getElementById('settingsBtn');
+    var settingsMenu = document.getElementById('settingsMenu');
+    var themeToggle = document.getElementById('themeToggle');
+    var themeIcon = document.getElementById('themeIcon');
+    var cookieSettingsBtn = document.getElementById('cookieSettingsBtn');
     var mask = document.getElementById('rippleMask');
     var body = document.body;
     var isProcessing = false;
     var activeCard = null;
     var consent = getCookie('cookie_consent');
+    var menuOpen = false;
 
-    // ===== 如果已有 consent，直接隐藏弹窗 =====
-    if (consent) {
-      banner.classList.add('hidden');
-    }
+    // ===== 下拉菜单 =====
+    settingsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      menuOpen = !menuOpen;
+      settingsMenu.classList.toggle('open', menuOpen);
+    });
 
-    // ===== 主题恢复（只在有 consent 时恢复） =====
-    if (consent) {
-      var savedTheme = getCookie('theme');
-      if (savedTheme === 'light') {
+    document.addEventListener('click', function() {
+      if (menuOpen) {
+        menuOpen = false;
+        settingsMenu.classList.remove('open');
+      }
+    });
+
+    // ===== 主题切换 =====
+    function applyTheme(theme) {
+      if (theme === 'light') {
         body.classList.add('light');
-        icon.className = 'fas fa-moon';
+        themeIcon.className = 'fas fa-sun';
       } else {
         body.classList.remove('light');
-        icon.className = 'fas fa-sun';
+        themeIcon.className = 'fas fa-moon';
+      }
+    }
+
+    function toggleTheme() {
+      if (!getCookie('cookie_consent')) return;
+      if (isProcessing) return;
+
+      var isLight = body.classList.contains('light');
+      var newTheme = isLight ? 'dark' : 'light';
+      applyTheme(newTheme);
+      if (getCookie('cookie_consent') === 'all') {
+        setCookie('theme', newTheme);
+      }
+    }
+
+    // ===== 恢复主题 =====
+    if (consent) {
+      banner.classList.add('hidden');
+      var savedTheme = getCookie('theme');
+      if (savedTheme === 'light') {
+        applyTheme('light');
+      } else {
+        applyTheme('dark');
       }
     } else {
-      body.classList.remove('light');
-      icon.className = 'fas fa-sun';
+      applyTheme('dark');
     }
+
+    // ===== 主题切换点击 =====
+    themeToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!getCookie('cookie_consent')) return;
+      toggleTheme();
+      // 关菜单
+      menuOpen = false;
+      settingsMenu.classList.remove('open');
+    });
+
+    // ===== Cookie 设置点击 =====
+    cookieSettingsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showCookieBanner();
+      menuOpen = false;
+      settingsMenu.classList.remove('open');
+    });
 
     // ===== 卡片光效 =====
     document.querySelectorAll('[data-card]').forEach(function(card) {
@@ -767,7 +953,7 @@
       });
     });
 
-    // ===== 显示 Cookie 弹窗 =====
+    // ===== Cookie 弹窗 =====
     function showCookieBanner() {
       banner.classList.remove('hidden', 'fade-out');
       banner.style.display = '';
@@ -777,7 +963,6 @@
       isProcessing = false;
     }
 
-    // ===== Cookie 弹窗按钮（先清空，再按选择生成） =====
     document.querySelectorAll('.cookie-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         if (isProcessing) return;
@@ -791,26 +976,18 @@
         banner.classList.add('fade-out');
 
         setTimeout(function() {
-          // 1. 先清空所有 Cookie
           clearAllCookies();
 
-          // 2. 再按选择生成
           if (choice === 'all') {
-            // 全部：存 consent + theme
             setCookie('cookie_consent', 'all');
             var isLight = body.classList.contains('light');
             setCookie('theme', isLight ? 'light' : 'dark');
           } else if (choice === 'necessary') {
-            // 仅必要：只存 consent
             setCookie('cookie_consent', 'necessary');
-            // 强制切回深色，删掉 theme
-            body.classList.remove('light');
-            icon.className = 'fas fa-sun';
+            applyTheme('dark');
           } else {
-            // 不接受：只存 consent = none
             setCookie('cookie_consent', 'none');
-            body.classList.remove('light');
-            icon.className = 'fas fa-sun';
+            applyTheme('dark');
           }
 
           banner.classList.add('hidden');
@@ -818,44 +995,6 @@
           allBtns.forEach(function(b) { b.disabled = false; });
         }, 700);
       });
-    });
-
-    // ===== 🍪 饼干按钮：重新打开 Cookie 设置 =====
-    settingsBtn.addEventListener('click', function() {
-      showCookieBanner();
-    });
-
-    // ===== 主题切换 =====
-    toggleBtn.addEventListener('click', function(e) {
-      if (!getCookie('cookie_consent')) return;
-      if (isProcessing) return;
-
-      var rect = toggleBtn.getBoundingClientRect();
-      var x = rect.left + rect.width / 2;
-      var y = rect.top + rect.height / 2;
-
-      var isLight = body.classList.contains('light');
-      var rippleColor = isLight ? 'dark-ripple' : 'light-ripple';
-
-      var circle = document.createElement('div');
-      circle.classList.add('ripple-circle', rippleColor);
-      var size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
-      circle.style.width = size + 'px';
-      circle.style.height = size + 'px';
-      circle.style.left = (x - size / 2) + 'px';
-      circle.style.top = (y - size / 2) + 'px';
-      mask.appendChild(circle);
-
-      setTimeout(function() {
-        body.classList.toggle('light');
-        var isNowLight = body.classList.contains('light');
-        icon.className = isNowLight ? 'fas fa-moon' : 'fas fa-sun';
-        if (getCookie('cookie_consent') === 'all') {
-          setCookie('theme', isNowLight ? 'light' : 'dark');
-        }
-      }, 300);
-
-      setTimeout(function() { circle.remove(); }, 2100);
     });
   </script>
 </body>
