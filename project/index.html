@@ -96,7 +96,6 @@
       margin-top: 0.8rem;
     }
 
-    /* ===== 设置按钮 ===== */
     .settings-btn {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(8px);
@@ -128,7 +127,6 @@
       background: rgba(255, 255, 255, 0.6);
     }
 
-    /* ===== 下拉菜单 ===== */
     .dropdown-menu {
       position: fixed;
       top: 0;
@@ -216,6 +214,11 @@
     body.light .nav-links a { color: #3f334d; }
     body.light .nav-links a:hover { color: #1d1129; border-bottom-color: #b8a3d6; }
 
+    /* 当前页高亮 - 只有横线，文字颜色不变 */
+    .nav-links a.active {
+      border-bottom-color: #a68bc9;
+    }
+
     @media (max-width: 550px) {
       .site-title { font-size: 1.8rem; }
       .header-bottom { gap: 1rem; }
@@ -226,7 +229,6 @@
       .dropdown-menu .dropdown-divider { height: 18px; }
     }
 
-    /* ===== 主内容 ===== */
     .main-content {
       display: flex;
       justify-content: center;
@@ -234,7 +236,6 @@
       min-height: 400px;
     }
 
-    /* ===== 卡片 ===== */
     .card-light {
       position: relative;
       overflow: hidden;
@@ -303,7 +304,6 @@
       color: #4f405f;
     }
 
-    /* ===== 光效 ===== */
     .card-light .light {
       position: absolute;
       top: 0; left: 0;
@@ -374,7 +374,6 @@
       100% { transform: scale(4.5); opacity: 0; }
     }
 
-    /* ===== Cookie 弹窗 ===== */
     .cookie-banner {
       position: fixed;
       bottom: 0;
@@ -540,7 +539,7 @@
         </button>
         <div class="nav-links">
           <a href="https://uzjhf-836.github.io/index.html"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
-          <a href="#" style="border-bottom-color: #a68bc9; color: #ece4f5;"><i class="fas fa-project-diagram"></i> 项目</a>
+          <a href="#" class="active"><i class="fas fa-project-diagram"></i> 项目</a>
         </div>
       </div>
     </div>
@@ -559,7 +558,6 @@
     </div>
   </div>
 
-  <!-- 下拉菜单 -->
   <div class="dropdown-menu" id="settingsMenu">
     <button class="dropdown-item" id="themeToggle">
       <i class="fas fa-sun" id="themeIcon"></i>
@@ -570,7 +568,6 @@
     </button>
   </div>
 
-  <!-- Cookie 弹窗 -->
   <div class="cookie-banner" id="cookieBanner">
     <div class="cookie-inner">
       <div class="cookie-text">
@@ -585,7 +582,6 @@
   </div>
 
   <script>
-    // ===== Cookie 工具函数 =====
     var COOKIE_MAX_AGE = 36500;
 
     function setCookie(name, value) {
@@ -618,14 +614,12 @@
     var consent = getCookie('cookie_consent');
     var menuOpen = false;
 
-    // ===== 下拉菜单位置计算 =====
     function updateMenuPosition() {
       var rect = settingsBtn.getBoundingClientRect();
       settingsMenu.style.top = (rect.bottom + 8) + 'px';
       settingsMenu.style.left = (rect.right - settingsMenu.offsetWidth) + 'px';
     }
 
-    // ===== 下拉菜单开关 =====
     settingsBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       menuOpen = !menuOpen;
@@ -656,7 +650,6 @@
       }
     });
 
-    // ===== 应用主题 =====
     function applyTheme(theme) {
       if (theme === 'light') {
         body.classList.add('light');
@@ -667,7 +660,6 @@
       }
     }
 
-    // ===== 切换主题 + 扩散动画 =====
     function toggleTheme() {
       if (!getCookie('cookie_consent')) return;
       if (isProcessing) return;
@@ -699,7 +691,6 @@
       setTimeout(function() { circle.remove(); }, 2100);
     }
 
-    // ===== 恢复主题 =====
     if (consent) {
       banner.classList.add('hidden');
       var savedTheme = getCookie('theme');
@@ -712,7 +703,6 @@
       applyTheme('dark');
     }
 
-    // ===== 主题切换点击 =====
     themeToggle.addEventListener('click', function(e) {
       e.stopPropagation();
       if (!getCookie('cookie_consent')) return;
@@ -721,7 +711,6 @@
       settingsMenu.classList.remove('open');
     });
 
-    // ===== Cookie 设置点击 =====
     cookieSettingsBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       showCookieBanner();
@@ -729,7 +718,6 @@
       settingsMenu.classList.remove('open');
     });
 
-    // ===== 卡片光效 =====
     document.querySelectorAll('[data-card]').forEach(function(card) {
       var light = card.querySelector('.light');
 
@@ -755,7 +743,6 @@
       });
     });
 
-    // ===== Cookie 弹窗 =====
     function showCookieBanner() {
       banner.classList.remove('hidden', 'fade-out');
       banner.style.display = '';
