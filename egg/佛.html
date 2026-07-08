@@ -5,24 +5,23 @@
 <title>?</title>
 </head>
 <body>
-<p id="text" style="font-size:28px;color:#2c3e50;text-align:center;padding:40px;border:2px solid #3498db;border-radius:10px;max-width:500px;margin:50px auto;">
+<p id="text" style="font-size:28px;color:#2c3e50;text-align:center;padding:40px;max-width:500px;margin:50px auto;">
   你点我干啥？
 </p>
 
 <script>
-setTimeout(() => {
-  document.getElementById('text').textContent = '彳亍。';
-}, 3000);
+let step = 0;
 
-setTimeout(() => {
-  document.getElementById('text').textContent = '我给你搞个佛祖';
-}, 6000);
-
-setTimeout(() => {
-  const userChoice = confirm('确定=诗  取消=佛祖');
-
-  if (userChoice) {
-    const poem = `写字楼里写字间，写字间里程序员；
+function updateText() {
+  step++;
+  if (step === 1) {
+    document.getElementById('text').textContent = '彳亍。';
+  } else if (step === 2) {
+    document.getElementById('text').textContent = '我给你搞个佛祖';
+  } else if (step === 3) {
+    const userChoice = confirm('确定=诗  取消=佛祖');
+    if (userChoice) {
+      const poem = `写字楼里写字间，写字间里程序员；
 程序人员写程序，又拿程序换酒钱。 
 酒醒只在网上坐，酒醉还来网下眠；
 酒醒只在网上坐，酒醉还来网下眠；
@@ -49,12 +48,11 @@ setTimeout(() => {
      ======`-.____`-.___\_____/___.-`____.-'======  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
                    佛祖保佑    永无BUG`;
-
-    navigator.clipboard.writeText(poem).then(() => {
-      alert('看看粘贴板呢┏ (゜ω゜)=👉');
-    }).catch(() => alert('复制失败'));
-  } else {
-    const buddha = `               _ooOoo_ 
+      navigator.clipboard.writeText(poem).then(() => {
+        alert('看看粘贴板呢┏ (゜ω゜)=👉');
+      }).catch(() => alert('复制失败'));
+    } else {
+      const buddha = `               _ooOoo_ 
               o8888888o 
               88" . "88 
               (| -_- |) 
@@ -71,12 +69,16 @@ setTimeout(() => {
         | | : `- \`.;`\ _ /`;.`/ - ` : | | 
         \ \ `-.  \_ __\ /__ _/  .-` / / 
      ======`-.____`-.___\_____/___.-`____.-'======`;
-
-    navigator.clipboard.writeText(buddha).then(() => {
-      alert('看看粘贴板呢┏ (゜ω゜)=👉');
-    }).catch(() => alert('复制失败'));
+      navigator.clipboard.writeText(buddha).then(() => {
+        alert('看看粘贴板呢┏ (゜ω゜)=👉');
+      }).catch(() => alert('复制失败'));
+    }
   }
-}, 7000);
+}
+
+setTimeout(updateText, 3000);
+setTimeout(updateText, 6000);
+setTimeout(updateText, 7000);
 </script>
 </body>
 </html>
