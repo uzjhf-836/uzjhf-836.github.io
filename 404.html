@@ -1,371 +1,373 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 - Zhixie's Page</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="icon" href="https://uzjhf-836.github.io/sources/w11.png">
-  <link rel="stylesheet" href="css/style.css">
-  <style>
-    /* ===== 主内容 ===== */
-    .main-content {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 450px;
-    }
+  <!DOCTYPE html>
+  <html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Zhixie's Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="https://uzjhf-836.github.io/sources/w11.png">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+      /* ===== 主内容 ===== */
+      .main-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 450px;
+      }
 
-    .card-light {
-      width: 100%;
-      max-width: 600px;
-      padding: 3.5rem 2.8rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      min-height: 380px;
-    }
+      .card-light {
+        width: 100%;
+        max-width: 700px;
+        padding: 3.5rem 2.8rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-height: 400px;
+      }
 
-    .card-light .error-code {
-      font-size: 6rem;
-      font-weight: 700;
-      color: #a68bc9;
-      opacity: 0.3;
-      line-height: 1;
-      margin-bottom: 0.5rem;
-      transition: color 0.2s ease;
-    }
-    body.light .card-light .error-code { color: #4a375d; }
+      .card-light .error-code {
+        font-size: 6rem;
+        font-weight: 700;
+        color: #a68bc9;
+        opacity: 0.3;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        transition: color 0.2s ease;
+      }
+      body.light .card-light .error-code { color: #4a375d; }
 
-    .card-light .error-icon {
-      font-size: 3.5rem;
-      color: #a68bc9;
-      opacity: 0.2;
-      margin-bottom: 1rem;
-      transition: color 0.2s ease;
-    }
-    body.light .card-light .error-icon { color: #4a375d; }
+      .card-light .error-icon {
+        font-size: 3.5rem;
+        color: #a68bc9;
+        opacity: 0.2;
+        margin-bottom: 1rem;
+        transition: color 0.2s ease;
+      }
+      body.light .card-light .error-icon { color: #4a375d; }
 
-    .card-light .card-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #ece4f5;
-      margin-bottom: 0.5rem;
-      transition: color 0.2s ease;
-    }
-    body.light .card-light .card-title { color: #1d1428; }
+      .card-light .card-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #ece4f5;
+        margin-bottom: 0.5rem;
+        transition: color 0.2s ease;
+      }
+      body.light .card-light .card-title { color: #1d1428; }
 
-    .card-light .card-sub {
-      font-size: 1rem;
-      color: #b0a4be;
-      opacity: 0.6;
-      margin-bottom: 1.8rem;
-      transition: color 0.2s ease;
-    }
-    body.light .card-light .card-sub { color: #4f405f; }
+      .card-light .card-sub {
+        font-size: 1rem;
+        color: #b0a4be;
+        opacity: 0.6;
+        margin-bottom: 1.8rem;
+        transition: color 0.2s ease;
+      }
+      body.light .card-light .card-sub { color: #4f405f; }
 
-    .card-light .back-btn {
-      display: inline-block;
-      padding: 0.7rem 2.2rem;
-      border-radius: 40px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
-      text-decoration: none;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
-      color: #b0a4be;
-      transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
-      cursor: pointer;
-    }
-    .card-light .back-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #ece4f5;
-    }
-    body.light .card-light .back-btn {
-      border-color: rgba(60, 40, 80, 0.08);
-      background: rgba(60, 40, 80, 0.04);
-      color: #4f405f;
-    }
-    body.light .card-light .back-btn:hover {
-      background: rgba(60, 40, 80, 0.1);
-      color: #1d1428;
-    }
+      .card-light .back-btn {
+        display: inline-block;
+        padding: 0.7rem 2.2rem;
+        border-radius: 40px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
+        text-decoration: none;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        color: #b0a4be;
+        transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+        cursor: pointer;
+      }
+      .card-light .back-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #ece4f5;
+      }
+      body.light .card-light .back-btn {
+        border-color: rgba(60, 40, 80, 0.08);
+        background: rgba(60, 40, 80, 0.04);
+        color: #4f405f;
+      }
+      body.light .card-light .back-btn:hover {
+        background: rgba(60, 40, 80, 0.1);
+        color: #1d1428;
+      }
 
-    @media (max-width: 700px) {
-      .card-light { padding: 2.5rem 1.5rem; min-height: 300px; }
-      .card-light .error-code { font-size: 4rem; }
-      .card-light .error-icon { font-size: 2.5rem; }
-      .card-light .card-title { font-size: 1.4rem; }
-    }
-  </style>
-</head>
-<body>
-  <div class="dark-overlay fade-in fade-in-1"></div>
-  <div class="ripple-mask" id="rippleMask"></div>
+      @media (max-width: 700px) {
+        .card-light { padding: 2.5rem 1.5rem; min-height: 300px; }
+        .card-light .error-code { font-size: 4rem; }
+        .card-light .error-icon { font-size: 2.5rem; }
+        .card-light .card-title { font-size: 1.4rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dark-overlay fade-in fade-in-1"></div>
+    <div class="ripple-mask" id="rippleMask"></div>
 
-  <div class="container">
-    <div class="header fade-in fade-in-1">
-      <div class="site-title">Zhixie's Page</div>
-      <div class="header-bottom">
-        <button class="settings-btn" id="settingsBtn" aria-label="设置">
-          <i class="fas fa-sliders-h"></i>
-        </button>
-        <div class="nav-links">
-          <a href="https://uzjhf-836.github.io/index.html"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
-          <a href="https://uzjhf-836.github.io/project/index.html"><i class="fas fa-project-diagram"></i> 项目</a>
+    <div class="container">
+      <div class="header fade-in fade-in-1">
+        <div class="site-title">Zhixie's Page</div>
+        <div class="header-bottom">
+          <button class="settings-btn" id="settingsBtn" aria-label="设置">
+            <i class="fas fa-sliders-h"></i>
+          </button>
+          <div class="nav-links">
+            <a href="https://uzjhf-836.github.io/index.html"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
+            <a href="https://uzjhf-836.github.io/project/index.html"><i class="fas fa-project-diagram"></i> 项目</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="card-light fade-in fade-in-2" data-card>
+          <div class="light" id="light1"></div>
+          <div class="error-code">404</div>
+          <div class="card-title">Page Not Found</div>
+          <a href="https://uzjhf-836.github.io/index.html" class="back-btn"><i class="fas fa-arrow-left" style="margin-right: 8px;"></i>返回首页</a>
+          <div class="card-sub" style="margin-bottom:0.2rem;">可能是你输错了URL,在看看呢？</div>
+          <div class="card-sub" style="margin-bottom:0.2rem;">不是的话...就是我的屎山代码又炸了，完蛋了，到<a href="https://github.com/uzjhf-836/uzjhf-836.github.io/issues">Issues</a>说下，不要骂我口牙qwq</div>
+        </div>
+      </div>
+
+      <div class="footer-note fade-in fade-in-3">
+        ©2026 只屑 保留所有权利。
+      </div>
+    </div>
+
+    <!-- 下拉菜单 -->
+    <div class="dropdown-menu" id="settingsMenu">
+      <button class="dropdown-item" id="themeToggle">
+        <i class="fas fa-sun" id="themeIcon"></i>
+      </button>
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item" id="cookieSettingsBtn">
+        <i class="fas fa-cookie-bite"></i>
+      </button>
+    </div>
+
+    <!-- Cookie 弹窗 -->
+    <div class="cookie-banner" id="cookieBanner">
+      <div class="cookie-inner">
+        <div class="cookie-text">
+          <strong>Cookies:</strong><br> 我们使用 Cookies 以为你提供个性化体验或广告服务(当然我肯定不会搞广告)
+        </div>
+        <div class="cookie-buttons">
+          <button class="cookie-btn primary" data-choice="all">接受所有 Cookies</button>
+          <button class="cookie-btn" data-choice="necessary">仅接受必要 Cookies</button>
+          <button class="cookie-btn reject" data-choice="none">不接受 Cookies</button>
         </div>
       </div>
     </div>
 
-    <div class="main-content">
-      <div class="card-light fade-in fade-in-2" data-card>
-        <div class="light" id="light1"></div>
-        <div class="error-code">404</div>
-        <div class="card-title">Page Not Found</div>
-        <a href="https://uzjhf-836.github.io/index.html" class="back-btn"><i class="fas fa-arrow-left" style="margin-right: 8px;"></i>返回首页</a>
-      </div>
-    </div>
+    <script>
+      var COOKIE_MAX_AGE = 36500;
 
-    <div class="footer-note fade-in fade-in-3">
-      ©2026 只屑 保留所有权利。
-    </div>
-  </div>
-
-  <!-- 下拉菜单 -->
-  <div class="dropdown-menu" id="settingsMenu">
-    <button class="dropdown-item" id="themeToggle">
-      <i class="fas fa-sun" id="themeIcon"></i>
-    </button>
-    <div class="dropdown-divider"></div>
-    <button class="dropdown-item" id="cookieSettingsBtn">
-      <i class="fas fa-cookie-bite"></i>
-    </button>
-  </div>
-
-  <!-- Cookie 弹窗 -->
-  <div class="cookie-banner" id="cookieBanner">
-    <div class="cookie-inner">
-      <div class="cookie-text">
-        <strong>Cookies:</strong><br> 我们使用 Cookies 以为你提供个性化体验或广告服务(当然我肯定不会搞广告)
-      </div>
-      <div class="cookie-buttons">
-        <button class="cookie-btn primary" data-choice="all">接受所有 Cookies</button>
-        <button class="cookie-btn" data-choice="necessary">仅接受必要 Cookies</button>
-        <button class="cookie-btn reject" data-choice="none">不接受 Cookies</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    var COOKIE_MAX_AGE = 36500;
-
-    function setCookie(name, value) {
-      var expires = new Date(Date.now() + COOKIE_MAX_AGE * 864e5).toUTCString();
-      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
-    }
-
-    function getCookie(name) {
-      var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-      return match ? decodeURIComponent(match[2]) : null;
-    }
-
-    function clearAllCookies() {
-      document.cookie.split(';').forEach(function(c) {
-        var name = c.split('=')[0].trim();
-        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      });
-    }
-
-    var banner = document.getElementById('cookieBanner');
-    var settingsBtn = document.getElementById('settingsBtn');
-    var settingsMenu = document.getElementById('settingsMenu');
-    var themeToggle = document.getElementById('themeToggle');
-    var themeIcon = document.getElementById('themeIcon');
-    var cookieSettingsBtn = document.getElementById('cookieSettingsBtn');
-    var mask = document.getElementById('rippleMask');
-    var body = document.body;
-    var isProcessing = false;
-    var activeCard = null;
-    var consent = getCookie('cookie_consent');
-    var menuOpen = false;
-
-    function updateMenuPosition() {
-      var rect = settingsBtn.getBoundingClientRect();
-      settingsMenu.style.top = (rect.bottom + 8) + 'px';
-      settingsMenu.style.left = (rect.right - settingsMenu.offsetWidth) + 'px';
-    }
-
-    settingsBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      menuOpen = !menuOpen;
-      if (menuOpen) {
-        updateMenuPosition();
-        settingsMenu.classList.add('open');
-      } else {
-        settingsMenu.classList.remove('open');
+      function setCookie(name, value) {
+        var expires = new Date(Date.now() + COOKIE_MAX_AGE * 864e5).toUTCString();
+        document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
       }
-    });
 
-    document.addEventListener('click', function() {
-      if (menuOpen) {
-        menuOpen = false;
-        settingsMenu.classList.remove('open');
+      function getCookie(name) {
+        var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : null;
       }
-    });
 
-    window.addEventListener('resize', function() {
-      if (menuOpen) {
-        updateMenuPosition();
+      function clearAllCookies() {
+        document.cookie.split(';').forEach(function(c) {
+          var name = c.split('=')[0].trim();
+          document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        });
       }
-    });
 
-    window.addEventListener('scroll', function() {
-      if (menuOpen) {
-        updateMenuPosition();
+      var banner = document.getElementById('cookieBanner');
+      var settingsBtn = document.getElementById('settingsBtn');
+      var settingsMenu = document.getElementById('settingsMenu');
+      var themeToggle = document.getElementById('themeToggle');
+      var themeIcon = document.getElementById('themeIcon');
+      var cookieSettingsBtn = document.getElementById('cookieSettingsBtn');
+      var mask = document.getElementById('rippleMask');
+      var body = document.body;
+      var isProcessing = false;
+      var activeCard = null;
+      var consent = getCookie('cookie_consent');
+      var menuOpen = false;
+
+      function updateMenuPosition() {
+        var rect = settingsBtn.getBoundingClientRect();
+        settingsMenu.style.top = (rect.bottom + 8) + 'px';
+        settingsMenu.style.left = (rect.right - settingsMenu.offsetWidth) + 'px';
       }
-    });
 
-    function applyTheme(theme) {
-      if (theme === 'light') {
-        body.classList.add('light');
-        themeIcon.className = 'fas fa-moon';
-      } else {
-        body.classList.remove('light');
-        themeIcon.className = 'fas fa-sun';
-      }
-    }
-
-    function toggleTheme() {
-      if (!getCookie('cookie_consent')) return;
-      if (isProcessing) return;
-
-      var rect = settingsBtn.getBoundingClientRect();
-      var x = rect.left + rect.width / 2;
-      var y = rect.top + rect.height / 2;
-
-      var isLight = body.classList.contains('light');
-      var rippleColor = isLight ? 'dark-ripple' : 'light-ripple';
-
-      var circle = document.createElement('div');
-      circle.classList.add('ripple-circle', rippleColor);
-      var size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
-      circle.style.width = size + 'px';
-      circle.style.height = size + 'px';
-      circle.style.left = (x - size / 2) + 'px';
-      circle.style.top = (y - size / 2) + 'px';
-      mask.appendChild(circle);
-
-      setTimeout(function() {
-        var newTheme = isLight ? 'dark' : 'light';
-        applyTheme(newTheme);
-        if (getCookie('cookie_consent') === 'all') {
-          setCookie('theme', newTheme);
+      settingsBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        menuOpen = !menuOpen;
+        if (menuOpen) {
+          updateMenuPosition();
+          settingsMenu.classList.add('open');
+        } else {
+          settingsMenu.classList.remove('open');
         }
-      }, 150);
+      });
 
-      setTimeout(function() { circle.remove(); }, 2100);
-    }
+      document.addEventListener('click', function() {
+        if (menuOpen) {
+          menuOpen = false;
+          settingsMenu.classList.remove('open');
+        }
+      });
 
-    if (consent) {
-      banner.classList.add('hidden');
-      var savedTheme = getCookie('theme');
-      if (savedTheme === 'light') {
-        applyTheme('light');
+      window.addEventListener('resize', function() {
+        if (menuOpen) {
+          updateMenuPosition();
+        }
+      });
+
+      window.addEventListener('scroll', function() {
+        if (menuOpen) {
+          updateMenuPosition();
+        }
+      });
+
+      function applyTheme(theme) {
+        if (theme === 'light') {
+          body.classList.add('light');
+          themeIcon.className = 'fas fa-moon';
+        } else {
+          body.classList.remove('light');
+          themeIcon.className = 'fas fa-sun';
+        }
+      }
+
+      function toggleTheme() {
+        if (!getCookie('cookie_consent')) return;
+        if (isProcessing) return;
+
+        var rect = settingsBtn.getBoundingClientRect();
+        var x = rect.left + rect.width / 2;
+        var y = rect.top + rect.height / 2;
+
+        var isLight = body.classList.contains('light');
+        var rippleColor = isLight ? 'dark-ripple' : 'light-ripple';
+
+        var circle = document.createElement('div');
+        circle.classList.add('ripple-circle', rippleColor);
+        var size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
+        circle.style.width = size + 'px';
+        circle.style.height = size + 'px';
+        circle.style.left = (x - size / 2) + 'px';
+        circle.style.top = (y - size / 2) + 'px';
+        mask.appendChild(circle);
+
+        setTimeout(function() {
+          var newTheme = isLight ? 'dark' : 'light';
+          applyTheme(newTheme);
+          if (getCookie('cookie_consent') === 'all') {
+            setCookie('theme', newTheme);
+          }
+        }, 150);
+
+        setTimeout(function() { circle.remove(); }, 2100);
+      }
+
+      if (consent) {
+        banner.classList.add('hidden');
+        var savedTheme = getCookie('theme');
+        if (savedTheme === 'light') {
+          applyTheme('light');
+        } else {
+          applyTheme('dark');
+        }
       } else {
         applyTheme('dark');
       }
-    } else {
-      applyTheme('dark');
-    }
 
-    themeToggle.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (!getCookie('cookie_consent')) return;
-      toggleTheme();
-      menuOpen = false;
-      settingsMenu.classList.remove('open');
-    });
-
-    cookieSettingsBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      showCookieBanner();
-      menuOpen = false;
-      settingsMenu.classList.remove('open');
-    });
-
-    document.querySelectorAll('[data-card]').forEach(function(card) {
-      var light = card.querySelector('.light');
-
-      card.addEventListener('mouseenter', function() {
-        light.classList.add('show');
-        activeCard = card;
+      themeToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (!getCookie('cookie_consent')) return;
+        toggleTheme();
+        menuOpen = false;
+        settingsMenu.classList.remove('open');
       });
 
-      card.addEventListener('mousemove', function(e) {
-        if (activeCard !== card) return;
-        var rect = card.getBoundingClientRect();
-        var x = ((e.clientX - rect.left) / rect.width) * 100;
-        var y = ((e.clientY - rect.top) / rect.height) * 100;
-        light.style.setProperty('--x', x + '%');
-        light.style.setProperty('--y', y + '%');
+      cookieSettingsBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        showCookieBanner();
+        menuOpen = false;
+        settingsMenu.classList.remove('open');
       });
 
-      card.addEventListener('mouseleave', function() {
-        if (activeCard === card) {
-          light.classList.remove('show');
-          activeCard = null;
-        }
-      });
-    });
+      document.querySelectorAll('[data-card]').forEach(function(card) {
+        var light = card.querySelector('.light');
 
-    function showCookieBanner() {
-      banner.classList.remove('hidden', 'fade-out');
-      banner.style.display = '';
-      document.querySelectorAll('.cookie-btn').forEach(function(b) {
-        b.disabled = false;
-      });
-      isProcessing = false;
-    }
+        card.addEventListener('mouseenter', function() {
+          light.classList.add('show');
+          activeCard = card;
+        });
 
-    document.querySelectorAll('.cookie-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        if (isProcessing) return;
+        card.addEventListener('mousemove', function(e) {
+          if (activeCard !== card) return;
+          var rect = card.getBoundingClientRect();
+          var x = ((e.clientX - rect.left) / rect.width) * 100;
+          var y = ((e.clientY - rect.top) / rect.height) * 100;
+          light.style.setProperty('--x', x + '%');
+          light.style.setProperty('--y', y + '%');
+        });
 
-        var choice = this.dataset.choice;
-        var allBtns = document.querySelectorAll('.cookie-btn');
-
-        allBtns.forEach(function(b) { b.disabled = true; });
-        isProcessing = true;
-
-        banner.classList.add('fade-out');
-
-        setTimeout(function() {
-          clearAllCookies();
-
-          if (choice === 'all') {
-            setCookie('cookie_consent', 'all');
-            var isLight = body.classList.contains('light');
-            setCookie('theme', isLight ? 'light' : 'dark');
-          } else if (choice === 'necessary') {
-            setCookie('cookie_consent', 'necessary');
-            applyTheme('dark');
-          } else {
-            setCookie('cookie_consent', 'none');
-            applyTheme('dark');
+        card.addEventListener('mouseleave', function() {
+          if (activeCard === card) {
+            light.classList.remove('show');
+            activeCard = null;
           }
-
-          banner.classList.add('hidden');
-          isProcessing = false;
-          allBtns.forEach(function(b) { b.disabled = false; });
-        }, 700);
+        });
       });
-    });
-  </script>
-</body>
-</html>
+
+      function showCookieBanner() {
+        banner.classList.remove('hidden', 'fade-out');
+        banner.style.display = '';
+        document.querySelectorAll('.cookie-btn').forEach(function(b) {
+          b.disabled = false;
+        });
+        isProcessing = false;
+      }
+
+      document.querySelectorAll('.cookie-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          if (isProcessing) return;
+
+          var choice = this.dataset.choice;
+          var allBtns = document.querySelectorAll('.cookie-btn');
+
+          allBtns.forEach(function(b) { b.disabled = true; });
+          isProcessing = true;
+
+          banner.classList.add('fade-out');
+
+          setTimeout(function() {
+            clearAllCookies();
+
+            if (choice === 'all') {
+              setCookie('cookie_consent', 'all');
+              var isLight = body.classList.contains('light');
+              setCookie('theme', isLight ? 'light' : 'dark');
+            } else if (choice === 'necessary') {
+              setCookie('cookie_consent', 'necessary');
+              applyTheme('dark');
+            } else {
+              setCookie('cookie_consent', 'none');
+              applyTheme('dark');
+            }
+
+            banner.classList.add('hidden');
+            isProcessing = false;
+            allBtns.forEach(function(b) { b.disabled = false; });
+          }, 700);
+        });
+      });
+    </script>
+  </body>
+  </html>
