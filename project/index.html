@@ -6,7 +6,7 @@
   <title>Zhixie's Page</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="icon" href="https://uzjhf-836.github.io/sources/w11.png">
   <style>
@@ -215,9 +215,12 @@
     body.light .nav-links a { color: #3f334d; }
     body.light .nav-links a:hover { color: #1d1129; border-bottom-color: #b8a3d6; }
 
-    /* 当前页高亮 - 只有横线，文字颜色不变 */
     .nav-links a.active {
       border-bottom-color: #a68bc9;
+      color: #ece4f5;
+    }
+    body.light .nav-links a.active {
+      color: #1d1428;
     }
 
     @media (max-width: 550px) {
@@ -230,13 +233,21 @@
       .dropdown-menu .dropdown-divider { height: 18px; }
     }
 
-    .main-content {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 400px;
+    /* ===== 项目卡片网格 ===== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
     }
 
+    /* ===== 卡片 ===== */
     .card-light {
       position: relative;
       overflow: hidden;
@@ -247,15 +258,9 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.4);
       transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s;
-      width: 100%;
-      max-width: 600px;
-      padding: 3rem 2.5rem;
+      padding: 2rem 2rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      min-height: 300px;
     }
     .card-light:hover {
       background: rgba(255, 255, 255, 0.1);
@@ -273,38 +278,7 @@
       transform: translateY(-2px);
     }
 
-    .card-light .card-icon {
-      font-size: 4rem;
-      color: #a68bc9;
-      opacity: 0.3;
-      margin-bottom: 1.5rem;
-      transition: color 0.2s ease;
-    }
-    body.light .card-light .card-icon {
-      color: #4a375d;
-    }
-
-    .card-light .card-title {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #ece4f5;
-      margin-bottom: 0.5rem;
-      transition: color 0.2s ease;
-    }
-    body.light .card-light .card-title {
-      color: #1d1428;
-    }
-
-    .card-light .card-sub {
-      font-size: 1rem;
-      color: #b0a4be;
-      opacity: 0.6;
-      transition: color 0.2s ease;
-    }
-    body.light .card-light .card-sub {
-      color: #4f405f;
-    }
-
+    /* ===== 光效 ===== */
     .card-light .light {
       position: absolute;
       top: 0; left: 0;
@@ -330,6 +304,119 @@
       z-index: 2;
     }
 
+    /* ===== 卡片标题 ===== */
+    .card-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ece4f5;
+      margin-bottom: 0.2rem;
+      line-height: 1.1;
+      transition: color 0.2s ease;
+    }
+    body.light .card-title {
+      color: #1d1428;
+    }
+
+    .card-sub {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ff5555;
+      margin-top: 0.2rem;
+      transition: color 0.2s ease;
+    }
+    body.light .card-sub {
+      color: #ff3b3b;
+    }
+
+    .card-version {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ece4f5;
+      margin-top: 0.1rem;
+      transition: color 0.2s ease;
+    }
+    body.light .card-version {
+      color: #1d1428;
+    }
+
+    .card-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .card-btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .card-btn {
+      padding: 1rem 3rem;
+      border-radius: 40px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: #b0a4be;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      user-select: none;
+    }
+    .card-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ece4f5;
+    }
+    body.light .card-btn {
+      border-color: rgba(60, 40, 80, 0.08);
+      background: rgba(60, 40, 80, 0.04);
+      color: #4f405f;
+    }
+    body.light .card-btn:hover {
+      background: rgba(60, 40, 80, 0.1);
+      color: #1d1428;
+    }
+
+    .card-btn.primary-btn {
+      border-color: rgba(166, 139, 201, 0.2);
+      background: rgba(166, 139, 201, 0.08);
+      color: #c9b8e0;
+    }
+    .card-btn.primary-btn:hover {
+      background: rgba(166, 139, 201, 0.2);
+      color: #ece4f5;
+    }
+    body.light .card-btn.primary-btn {
+      border-color: rgba(90, 66, 119, 0.1);
+      background: rgba(90, 66, 119, 0.05);
+      color: #4a375d;
+    }
+    body.light .card-btn.primary-btn:hover {
+      background: rgba(90, 66, 119, 0.12);
+      color: #1d1428;
+    }
+
+    /* Claude Time Generate 高度 300px */
+    .card-tall {
+      min-height: 300px;
+    }
+    @media (max-width: 800px) {
+      .card-tall {
+        min-height: 250px;
+      }
+    }
+
     .footer-note {
       margin-top: 3.2rem;
       text-align: center;
@@ -342,6 +429,24 @@
       transition: color 0.2s ease, border-color 0.2s ease;
     }
     body.light .footer-note { color: #5b4b6b; border-top-color: rgba(60, 40, 80, 0.06); }
+
+    @media (max-width: 450px) {
+      .card-title { font-size: 2rem; }
+      .card-sub { font-size: 0.85rem; }
+      .card-version { font-size: 0.85rem; }
+      .card-light { padding: 1.5rem; }
+      .card-btn { padding: 0.8rem 2rem; font-size: 0.95rem; }
+      .card-btn-group { gap: 0.6rem; }
+      .card-light .light {
+        background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 209, 209, 0.35) 0%, rgba(255, 209, 209, 0.12) 30%, transparent 60%);
+      }
+      body.light .card-light .light {
+        background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 209, 209, 0.5) 0%, rgba(255, 209, 209, 0.2) 30%, transparent 60%);
+      }
+      .card-tall {
+        min-height: 200px;
+      }
+    }
 
     @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
     .fade-in { opacity: 0; animation: fadeIn 0.8s ease forwards; }
@@ -375,6 +480,7 @@
       100% { transform: scale(4.5); opacity: 0; }
     }
 
+    /* ===== Cookie 弹窗 ===== */
     .cookie-banner {
       position: fixed;
       bottom: 0;
@@ -545,18 +651,60 @@
       </div>
     </div>
 
-    <div class="main-content">
+    <div class="projects-grid">
+      <!-- MyTools 卡片 -->
       <div class="card-light fade-in fade-in-2" data-card>
         <div class="light" id="light1"></div>
-        <div class="card-title">建设中......</div>
+        <div class="card-title">MyTools</div>
+        <div class="card-sub">NEW VER</div>
+        <div class="card-version">1.5.1 / 1.5.2winUI3 beta1</div>
+        <div class="card-content">
+          <div class="card-btn-group">
+            <a href="https://github.com/uzjhf-836/MyTools/releases/tag/v1.5.1" target="_blank" class="card-btn primary-btn">MyTools</a>
+            <a href="https://github.com/uzjhf-836/MyTools_winUI3/releases/tag/v1.5.2b1" target="_blank" class="card-btn">MyToolsWinUI3</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右列 -->
+      <div style="display:flex;flex-direction:column;gap:2rem;">
+        <!-- Edit text 卡片 -->
+        <div class="card-light fade-in fade-in-3" data-card>
+          <div class="light" id="light2"></div>
+          <div class="card-title">Edit text</div>
+          <div class="card-sub">NEW VER</div>
+          <div class="card-version">v1.0.1</div>
+          <div class="card-content">
+            <div class="card-btn-group">
+              <a href="https://github.com/uzjhf-836/MyTools_affiliatd---edit_text" target="_blank" class="card-btn primary-btn">
+                <i class="fab fa-github"></i> GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Claude Time Generate 卡片 - 高度 300px -->
+        <div class="card-light card-tall fade-in fade-in-4" data-card>
+          <div class="light" id="light3"></div>
+          <div class="card-title">Claude Time Generate</div>
+          <div class="card-version" style="margin-top:0.2rem;">v1.0</div>
+          <div class="card-content">
+            <div class="card-btn-group">
+              <a href="https://github.com/uzjhf-836/Claude_Time_Generate" target="_blank" class="card-btn primary-btn">
+                <i class="fab fa-github"></i> GitHub
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="footer-note fade-in fade-in-3">
+    <div class="footer-note fade-in fade-in-5">
       ©2026 只屑. 保留所有权利。
     </div>
   </div>
 
+  <!-- 下拉菜单 -->
   <div class="dropdown-menu" id="settingsMenu">
     <button class="dropdown-item" id="themeToggle">
       <i class="fas fa-sun" id="themeIcon"></i>
@@ -567,10 +715,11 @@
     </button>
   </div>
 
+  <!-- Cookie 弹窗 -->
   <div class="cookie-banner" id="cookieBanner">
     <div class="cookie-inner">
       <div class="cookie-text">
-        <strong>Cookies:</strong><br> 我们使用 Cookies 以为你提供个性化体验或广告服务(当然我肯定不会搞广告)
+        <strong>Cookies:</strong><br> 我们使用 Cookies 以为你提供个性化体验或广告服务(当然我肯定不会搞广告)，不会上传到服务器
       </div>
       <div class="cookie-buttons">
         <button class="cookie-btn primary" data-choice="all">接受所有 Cookies</button>
