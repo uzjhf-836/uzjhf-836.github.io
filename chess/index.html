@@ -3,141 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>项目 - Zhixie's Page</title>
+  <title>页面标题</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" href="https://uzjhf-836.github.io/sources/w11.png">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    .projects-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      align-items: start;
-    }
-    @media (max-width: 800px) { .projects-grid { grid-template-columns: 1fr; gap: 2rem; } }
-
-    .card-light {
-      padding: 2rem 2rem;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card-title {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: #ece4f5;
-      margin-bottom: 0.2rem;
-      line-height: 1.1;
-      transition: color 0.2s ease;
-    }
-    body.light .card-title { color: #1d1428; }
-
-    .card-sub {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #ff5555;
-      margin-top: 0.2rem;
-      transition: color 0.2s ease;
-    }
-    body.light .card-sub { color: #ff3b3b; }
-
-    .card-version {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #ece4f5;
-      margin-top: 0.1rem;
-      transition: color 0.2s ease;
-    }
-    body.light .card-version { color: #1d1428; }
-
-    .card-content {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    .card-btn-group {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .card-btn {
-      padding: 1rem 3rem;
-      border-radius: 40px;
-      font-size: 1.15rem;
-      font-weight: 600;
-      font-family: 'HarmonyOS Sans SC', 'Inter', sans-serif;
-      cursor: pointer;
-      transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
-      color: #b0a4be;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      user-select: none;
-    }
-    .card-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #ece4f5;
-    }
-    body.light .card-btn {
-      border-color: rgba(60, 40, 80, 0.08);
-      background: rgba(60, 40, 80, 0.04);
-      color: #4f405f;
-    }
-    body.light .card-btn:hover {
-      background: rgba(60, 40, 80, 0.1);
-      color: #1d1428;
-    }
-
-    .card-btn.primary-btn {
-      border-color: rgba(166, 139, 201, 0.2);
-      background: rgba(166, 139, 201, 0.08);
-      color: #c9b8e0;
-    }
-    .card-btn.primary-btn:hover {
-      background: rgba(166, 139, 201, 0.2);
-      color: #ece4f5;
-    }
-    body.light .card-btn.primary-btn {
-      border-color: rgba(90, 66, 119, 0.1);
-      background: rgba(90, 66, 119, 0.05);
-      color: #4a375d;
-    }
-    body.light .card-btn.primary-btn:hover {
-      background: rgba(90, 66, 119, 0.12);
-      color: #1d1428;
-    }
-
-    .card-tall { min-height: 300px; }
-    @media (max-width: 800px) { .card-tall { min-height: 250px; } }
-
-    @media (max-width: 450px) {
-      .card-title { font-size: 2rem; }
-      .card-sub { font-size: 0.85rem; }
-      .card-version { font-size: 0.85rem; }
-      .card-light { padding: 1.5rem; }
-      .card-btn { padding: 0.8rem 2rem; font-size: 0.95rem; }
-      .card-btn-group { gap: 0.6rem; }
-      .card-light .light {
-        background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 209, 209, 0.35) 0%, rgba(255, 209, 209, 0.12) 30%, transparent 60%);
-      }
-      body.light .card-light .light {
-        background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%), rgba(255, 209, 209, 0.5) 0%, rgba(255, 209, 209, 0.2) 30%, transparent 60%);
-      }
-      .card-tall { min-height: 200px; }
-    }
+    /* 页面专属样式写这里 */
   </style>
 </head>
 <body>
@@ -145,6 +18,7 @@
   <div class="ripple-mask" id="rippleMask"></div>
 
   <div class="container">
+    <!-- ===== 页头 ===== -->
     <div class="header fade-in fade-in-1">
       <div class="site-title">Zhixie's Page</div>
       <div class="header-bottom">
@@ -152,82 +26,43 @@
           <i class="fas fa-sliders-h"></i>
         </button>
         <div class="nav-links">
-          <a href="https://uzjhf-836.github.io/index.html"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
-          <a href="#" class="active"><i class="fas fa-project-diagram"></i> 项目</a>
+          <a href="/index.html"><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
+          <a href="/project/index.html"><i class="fas fa-project-diagram"></i> 项目</a>
         </div>
       </div>
     </div>
 
-    <div class="projects-grid">
-      <!-- MyTools 卡片 -->
-      <div style="display:flex;flex-direction:column;gap:2rem;">
-        <div class="card-light fade-in fade-in-2" data-card>
-          <div class="light" id="light1"></div>
-          <div class="card-title">MyTools</div>
-          <div class="card-sub">NEW VER</div>
-          <div class="card-version">1.5.1 / 1.5.2winUI3 beta1</div>
-          <div class="card-content">
-            <div class="card-btn-group">
-              <a href="https://github.com/uzjhf-836/MyTools/releases/tag/v1.5.1" target="_blank" class="card-btn primary-btn">MyTools</a>
-              <a href="https://github.com/uzjhf-836/MyTools_winUI3/releases/tag/v1.5.2b1" target="_blank" class="card-btn">MyToolsWinUI3</a>
-            </div>
-          </div>
-        </div>
+    <!-- ===== 主内容 ===== -->
+    <div class="main-content">
 
-        <!-- Cear 卡片 -->
-        <div class="card-light fade-in fade-in-3" data-card style="min-height:300px;">
-          <div class="light" id="light4"></div>
-          <div class="card-title">Cear</div>
-          <div class="card-version">1.0</div>
-          <div class="card-content">
-            <div class="card-btn-group">
-              <a href="https://github.com/uzjhf-836/Cear" target="_blank" class="card-btn primary-btn">
-                <i class="fab fa-github"></i> GitHub
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 右列 -->
-      <div style="display:flex;flex-direction:column;gap:2rem;">
-        <!-- Edit text 卡片 -->
-        <div class="card-light fade-in fade-in-3" data-card>
-          <div class="light" id="light2"></div>
-          <div class="card-title">Edit text</div>
-          <div class="card-sub">NEW VER</div>
-          <div class="card-version">1.1</div>
-          <div class="card-content">
-            <div class="card-btn-group">
-              <a href="https://github.com/uzjhf-836/MyTools_affiliatd---edit_text" target="_blank" class="card-btn primary-btn">
-                <i class="fab fa-github"></i> GitHub
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Claude Time Generate 卡片 - 高度 300px -->
-        <div class="card-light card-tall fade-in fade-in-4" data-card>
-          <div class="light" id="light3"></div>
-          <div class="card-title">Claude Time Generate</div>
-          <div class="card-version" style="margin-top:0.2rem;">1.0</div>
-          <div class="card-content">
-            <div class="card-btn-group">
-              <a href="https://github.com/uzjhf-836/Claude_Time_Generate" target="_blank" class="card-btn primary-btn">
-                <i class="fab fa-github"></i> GitHub
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <h1 style="color: #FFFFFF;">Old version:</h1>
+      <a href=./old/v1.0.0.html style="font-size: 16px; display: block;">v1.0.0</a>
+      <a href=./old/v1.1.0.html style="font-size: 16px; display: block;">v1.1.0</a>
+      <a href=./old/v1.2.0.html style="font-size: 16px; display: block;">v1.2.0</a>
+      <a href=./old/v1.3.0.html style="font-size: 16px; display: block;">v1.3.0</a>
+      <a href=./old/v1.4.0.html style="font-size: 16px; display: block;">v1.4.0</a>
+      <a href=./old/v1.5.0.html style="font-size: 16px; display: block;">v1.5.0</a>
+      <a href=./old/v1.6.0.html style="font-size: 16px; display: block;">v1.6.0</a>
+      <a href=./old/v1.7.0.html style="font-size: 16px; display: block;">v1.7.0</a>
+      <a href=./old/v1.8.0.html style="font-size: 16px; display: block;">v1.8.0</a>
+      <a href=./old/v1.9.0.html style="font-size: 16px; display: block;">v1.9.0</a>
+      <a href=./old/v1.10.0.html style="font-size: 16px; display: block;">v1.10.0</a>
+      <a href=./old/v1.11.0.html style="font-size: 16px; display: block;">v1.11.0</a>
+      <a href=./old/v1.12.0.html style="font-size: 16px; display: block;">v1.12.0</a>
+      <a href=./old/v1.13.0.html style="font-size: 16px; display: block;">v1.13.0</a>
+      <h1 style="color: #FFFFFF;">New version:</h1>
+      <a href=./v1.13.0只屑修改版.html style="font-size: 16px; display: block;">只屑改版v1.13.0</a>
+      <a href=./v1.14.0.html style="font-size: 16px; display: block;">v1.14.0</a>
+      <em><h5 style="color: #FFFFFF;font-style: italic;">PS:我经过WHXChess的授权了</h5></em>
     </div>
 
-    <div class="footer-note fade-in fade-in-5">
-      ©2026 只屑 保留所有权利。
+    <!-- ===== 页脚 ===== -->
+    <div class="footer-note fade-in fade-in-6">
+      &copy;2026 只屑 保留所有权利。
     </div>
   </div>
 
-  <!-- 下拉菜单 -->
+  <!-- ===== 下拉菜单 ===== -->
   <div class="dropdown-menu" id="settingsMenu">
     <button class="dropdown-item" id="themeToggle">
       <i class="fas fa-sun" id="themeIcon"></i>
@@ -238,7 +73,7 @@
     </button>
   </div>
 
-  <!-- Cookie 弹窗 -->
+  <!-- ===== Cookie 弹窗 ===== -->
   <div class="cookie-banner" id="cookieBanner">
     <div class="cookie-inner">
       <div class="cookie-text">
@@ -310,15 +145,11 @@
     });
 
     window.addEventListener('resize', function() {
-      if (menuOpen) {
-        updateMenuPosition();
-      }
+      if (menuOpen) updateMenuPosition();
     });
 
     window.addEventListener('scroll', function() {
-      if (menuOpen) {
-        updateMenuPosition();
-      }
+      if (menuOpen) updateMenuPosition();
     });
 
     function applyTheme(theme) {
@@ -391,12 +222,7 @@
 
     document.querySelectorAll('[data-card]').forEach(function(card) {
       var light = card.querySelector('.light');
-
-      card.addEventListener('mouseenter', function() {
-        light.classList.add('show');
-        activeCard = card;
-      });
-
+      card.addEventListener('mouseenter', function() { light.classList.add('show'); activeCard = card; });
       card.addEventListener('mousemove', function(e) {
         if (activeCard !== card) return;
         var rect = card.getBoundingClientRect();
@@ -405,39 +231,28 @@
         light.style.setProperty('--x', x + '%');
         light.style.setProperty('--y', y + '%');
       });
-
       card.addEventListener('mouseleave', function() {
-        if (activeCard === card) {
-          light.classList.remove('show');
-          activeCard = null;
-        }
+        if (activeCard === card) { light.classList.remove('show'); activeCard = null; }
       });
     });
 
     function showCookieBanner() {
       banner.classList.remove('hidden', 'fade-out');
       banner.style.display = '';
-      document.querySelectorAll('.cookie-btn').forEach(function(b) {
-        b.disabled = false;
-      });
+      document.querySelectorAll('.cookie-btn').forEach(function(b) { b.disabled = false; });
       isProcessing = false;
     }
 
     document.querySelectorAll('.cookie-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         if (isProcessing) return;
-
         var choice = this.dataset.choice;
         var allBtns = document.querySelectorAll('.cookie-btn');
-
         allBtns.forEach(function(b) { b.disabled = true; });
         isProcessing = true;
-
         banner.classList.add('fade-out');
-
         setTimeout(function() {
           clearAllCookies();
-
           if (choice === 'all') {
             setCookie('cookie_consent', 'all');
             var isLight = body.classList.contains('light');
@@ -449,7 +264,6 @@
             setCookie('cookie_consent', 'none');
             applyTheme('dark');
           }
-
           banner.classList.add('hidden');
           isProcessing = false;
           allBtns.forEach(function(b) { b.disabled = false; });

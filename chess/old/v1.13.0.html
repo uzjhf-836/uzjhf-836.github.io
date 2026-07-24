@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国际象棋 · 残局大师版（完整开局库）</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #2b2b3a; min-height: 100vh; display: flex; justify-content: center; align-items: center; user-select: none; padding: 16px; }
+        .container { width: 620px; max-width: 100%; background: #3d3d52; border-radius: 32px; padding: 24px 24px 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; }
+        .page { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .page.active { display: flex; }
+        #menu-page .title { font-size: 52px; font-weight: 700; color: #f0e6d3; text-shadow: 0 4px 0 #6b5b4a; letter-spacing: 6px; margin-bottom: 20px; }
+        .menu-card { background: #4f4f68; border-radius: 20px; padding: 30px 40px; width: 100%; }
+        .menu-item { background: #5e5e7a; padding: 18px 28px; border-radius: 16px; color: #f0e6d3; font-size: 22px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+        .menu-item:first-child { margin-top: 0; }
+        .menu-item:hover { background: #6f6f90; transform: translateY(-2px); }
+
+        #setup-overlay, #settings-overlay, #character-overlay, #custom-board-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            border-radius: 32px; z-index: 100; 
+            display: none; pointer-events: none; transform: scale(0.9); opacity: 0;
+            justify-content: center; align-items: center;
+        }
+        #setup-overlay.active, #settings-overlay.active, #character-overlay.active, #custom-board-overlay.active {
+            display: flex;
+            animation: modalIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            pointer-events: none;
+        }
+        #setup-overlay.closing, #settings-overlay.closing, #character-overlay.closing, #custom-board-overlay.closing {
+            display: flex;
+            animation: modalOut 0.2s ease-in forwards;
+            pointer-events: none;
+        }
+        @keyframes modalIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes modalOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.9); }
+        }
+
+        .modal { background: #4f4f68; border-radius: 20px; padding: 30px 40px; width: 90%; max-width: 520px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); max-height: 90vh; overflow-y: auto; }
+        .modal h3 { color: #f0e6d3; text-align: center; margin-bottom: 24px; font-size: 26px; }
+        .settings-group { margin-bottom: 20px; }
+        .settings-group label { display: block; color: #b8a99a; margin-bottom: 8px; font-size: 14px; font-weight: bold; }
+        .options-grid { display: flex; flex-wrap: wrap; gap: 10px; background: #3d3d52; padding: 12px; border-radius: 12px; }
+        .opt { flex: 1 0 auto; min-width: 40px; text-align: center; background: #5e5e7a; color: #f0e6d3; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 14px; }
+        .opt:hover { background: #6f6f90; }
+        .opt.selected { background: #f0e6d3; color: #2b2b3a; transform: scale(1.05); box-shadow: 0 0 10px rgba(240,230,211,0.4); }
+        .btn-main { width: 100%; background: #f0e6d3; color: #2b2b3a; border: none; padding: 16px; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; transition: background 0.3s; margin-top: 8px; }
+        .btn-main:hover { background: #fff; }
+        .btn-close { background: #5e5e7a; color: #f0e6d3; border: none; padding: 12px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; margin-top: 8px; width: 100%; }
+        .btn-close:hover { background: #6f6f90; }
+        .char-modal { display: flex; flex-direction: column; padding: 0; overflow: hidden; background: #4f4f68; border-radius: 20px; width: 90%; max-width: 520px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); max-height: 90vh; }
+        .char-home { height: 20%; background: #3d3d52; padding: 20px; border-bottom: 2px solid #2b2b3a; display: flex; flex-direction: column; justify-content: center; }
+        .char-home h3 { color: #f0e6d3; font-size: 20px; margin-bottom: 4px; }
+        .char-home p { color: #b8a99a; font-size: 14px; }
+        .char-list { height: 65%; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .char-list .opt { padding: 12px 18px; font-size: 16px; }
+        .char-footer { height: 15%; padding: 16px 20px; border-top: 2px solid #2b2b3a; display: flex; align-items: center; justify-content: center; }
+        .char-footer .btn-main { margin-top: 0; }
+        .char-footer .btn-main:disabled { opacity: 0.5; cursor: not-allowed; background: #888; }
+        .color-section { display: flex; flex-wrap: wrap; align-items: center; background: #3d3d52; padding: 8px 12px; border-radius: 8px; margin: 6px 0; }
+        .color-section label { flex: 1; font-weight: normal; font-size: 13px; color: #f0e6d3; min-width: 60px;}
+        .color-inputs { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .color-inputs input[type="color"] { border: none; width: 32px; height: 32px; padding: 0; cursor: pointer; background: transparent; border-radius: 4px; border: 1px solid #5e5e7a;}
+        .color-inputs input[type="text"] { width: 70px; padding: 4px 6px; border-radius: 4px; border: 1px solid #5e5e7a; background: #2b2b3a; color: #f0e6d3; font-size: 12px; text-align: center;}
+        #custom-board-overlay .custom-modal { background: #4f4f68; border-radius: 20px; padding: 24px 28px; width: 90%; max-width: 720px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 20px; max-height: 85vh; overflow-y: auto; }
+        .custom-modal h3 { color: #f0e6d3; text-align: center; font-size: 24px; margin: 0; }
+        .custom-layout { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .custom-board-wrapper { flex: 0 0 280px; background: #2b2b3a; border-radius: 12px; padding: 8px; }
+        #customCanvas { width: 100%; aspect-ratio: 1/1; background: #ebd9c0; border-radius: 6px; cursor: pointer; display: block; }
+        .custom-controls { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 12px; }
+        .custom-control-group { display: flex; flex-direction: column; gap: 6px; }
+        .custom-control-group label { color: #b8a99a; font-size: 14px; font-weight: bold; }
+        .piece-picker { display: flex; flex-wrap: wrap; gap: 6px; background: #3d3d52; padding: 8px; border-radius: 8px; }
+        .picker-opt { width: 36px; height: 36px; font-size: 26px; line-height: 36px; text-align: center; background: #5e5e7a; border-radius: 6px; cursor: pointer; transition: 0.2s; color: #f0e6d3; border: 2px solid transparent; }
+        .picker-opt:hover { background: #6f6f90; }
+        .picker-opt.active { border-color: #f0e6d3; transform: scale(1.1); }
+        .custom-opt { background: #5e5e7a; color: #f0e6d3; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .custom-opt:hover { background: #6f6f90; }
+        .custom-opt.active { background: #f0e6d3; color: #2b2b3a; }
+        .custom-actions { display: flex; gap: 10px; margin-top: 6px; }
+        .custom-actions .btn-main { margin: 0; padding: 12px; flex: 1; }
+        #btn-clear-board { background: #5e5e7a; color: #f0e6d3; border: none; padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; font-size: 16px; font-weight: bold; flex: 0.5; }
+        #btn-clear-board:hover { background: #6f6f90; }
+        #game-page { gap: 10px; }
+        .board-wrapper { position: relative; background: #2b2b3a; border-radius: 18px; padding: 14px; width: 100%; aspect-ratio: 1/1; max-width: 560px; margin: 0 auto; transition: box-shadow 0.3s ease; }
+        #chessCanvas { display: block; width: 100%; height: 100%; border-radius: 10px; background: #ebd9c0; cursor: pointer; position: relative; z-index: 1; }
+        #anim-overlay { position: absolute; top: 14px; left: 14px; width: calc(100% - 28px); height: calc(100% - 28px); pointer-events: none; z-index: 20; border-radius: 10px; overflow: hidden; }
+        .anim-piece { position: absolute; font-family: 'Segoe UI', 'Arial Unicode MS'; text-align: center; line-height: 1; pointer-events: none; will-change: transform; transition: transform 0.2s linear; z-index: 25; text-shadow: 0 2px 8px rgba(0,0,0,0.35); }
+        .anim-piece.captured { transition: opacity 0.2s ease-out; z-index: 26; opacity: 1; }
+        .player-panel { width: 100%; background: #4f4f68; border-radius: 16px; padding: 10px 18px; display: flex; flex-direction: column; gap: 4px; box-shadow: inset 0 2px 8px rgba(255,255,255,0.05); }
+        .panel-header { position: relative; display: flex; justify-content: space-between; align-items: center; }
+        .panel-header .label { color: #b8a99a; font-weight: bold; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .panel-header .time-display { color: #f0e6d3; font-size: 20px; font-weight: bold; font-variant-numeric: tabular-nums; transition: color 0.3s; }
+        .panel-header .time-display.low-time { color: #ff4444; }
+        .panel-header .time-display.blink { visibility: hidden; }
+        .progress-bar-container { width: 100%; height: 5px; background: #3d3d52; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease, background 0.3s ease; }
+        .chat-bubble { position: absolute; top: -50px; left: 70px; background: #f0e6d3; color: #2b2b3a; padding: 6px 14px; border-radius: 12px 12px 12px 0; font-size: 14px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transform: scale(0); opacity: 0; transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.5s ease-in-out; transform-origin: bottom left; z-index: 50; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+        .chat-bubble::after { content: ''; position: absolute; bottom: -6px; left: 12px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid #f0e6d3; }
+        .chat-bubble.show { transform: scale(1); opacity: 1; }
+        .captured-display { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; padding-top: 4px; border-top: 1px solid #3d3d52; margin-top: 2px; min-height: 28px; }
+        .captured-display .pieces { display: flex; flex-wrap: wrap; gap: 2px; font-size: 20px; }
+        .captured-display .pieces span { line-height: 1; }
+        .captured-display .score { font-size: 16px; font-weight: bold; color: #f0e6d3; margin-left: auto; padding-left: 8px; }
+        .captured-display .score.positive { color: #4caf50; }
+        .btn-icon { background: transparent; border: 1px solid #6b5b4a; color: #f0e6d3; font-size: 18px; width: 36px; height: 36px; border-radius: 30px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-icon:hover { background: #5e5e7a; }
+        .btn-back { background: transparent; border: 1px solid #6b5b4a; color: #f0e6d3; font-size: 14px; padding: 4px 14px; border-radius: 30px; cursor: pointer; transition: background 0.2s; }
+        .btn-back:hover { background: #5e5e7a; }
+        .key-hint { color: #6b5b4a; font-size: 12px; letter-spacing: 0.5px; margin-top: 4px; text-align: center; width: 100%; }
+        .key-hint kbd { background: #4f4f68; color: #f0e6d3; padding: 0 8px; border-radius: 4px; font-size: 11px; }
+        #promotion-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; display: none; width: 320px; padding: 24px; background: #4f4f68; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); justify-content: center; gap: 16px; flex-wrap: wrap; }
+        #promotion-overlay.active { display: flex; }
+        .promo-opt { width: 60px; height: 60px; font-size: 44px; display: flex; align-items: center; justify-content: center; background: #2b2b3a; border-radius: 12px; cursor: pointer; transition: 0.2s; color: #f0e6d3; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .promo-opt:hover { background: #5e5e7a; transform: scale(1.1); }
+        @media (max-width: 500px) { .container { padding: 14px 14px 20px; border-radius: 20px; } .modal { padding: 16px; } .menu-item { font-size: 18px; padding: 14px 20px; } #custom-board-overlay .custom-modal { padding: 16px; } .custom-board-wrapper { flex: 0 0 220px; } .panel-header .time-display { font-size: 16px; } .board-wrapper { padding: 8px; } #promotion-overlay { width: 260px; padding: 16px; gap: 10px; } .promo-opt { width: 50px; height: 50px; font-size: 36px; } .captured-display .pieces { font-size: 16px; } .captured-display .score { font-size: 14px; } .chat-bubble { left: 60px; font-size: 12px; top: -42px; max-width: 150px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="menu-page" class="page active">
+            <div class="title">♚ 国际象棋</div>
+            <div class="menu-card">
+                <div class="menu-item" id="btn-play"><span>♟</span><span>开始对局</span><span>▶</span></div>
+                <div class="menu-item" id="btn-custom-game"><span>🛠️</span><span>自定义棋局</span><span>▶</span></div>
+                <div class="menu-item" id="btn-settings-menu"><span>⚙️</span><span>外观设置</span><span>▶</span></div>
+            </div>
+        </div>
+
+        <div id="setup-overlay"><div class="setup-modal modal">
+            <h3>⚙️ 对局设置</h3>
+            <div class="settings-group"><label>⏱ 下棋时间</label>
+                <div class="options-grid" id="time-options">
+                    <span class="opt" data-val="inf">无限</span>
+                    <span class="opt" data-val="900">15分钟</span>
+                    <span class="opt selected" data-val="600">10分钟</span>
+                    <span class="opt" data-val="300">5分钟</span>
+                    <span class="opt" data-val="60">1分钟</span>
+                    <span class="opt" data-val="30">30秒</span>
+                </div>
+            </div>
+            <div style="text-align:center; margin-bottom:12px;">
+                <button id="btn-choose-character" style="width:85%; padding:16px; border-radius:12px; background:#5e5e7a; color:#f0e6d3; font-size:20px; font-weight:bold; border:2px solid transparent; cursor:pointer; transition:0.2s;">👤 选择角色</button>
+                <div style="margin-top:8px; color:#f0e6d3; font-size:14px;">当前角色：<span id="selected-character-name" style="font-weight:bold; color:#ffd700;">AI：3 (强力)</span></div>
+            </div>
+            <button class="btn-main" id="btn-start-game">开始对局</button>
+        </div></div>
+
+        <div id="character-overlay"><div class="char-modal">
+            <div class="char-home" id="character-home">
+                <h3 id="char-home-title">请选择一个角色</h3>
+                <p id="char-home-desc">点击下方角色查看详情。</p>
+            </div>
+            <div class="char-list" id="character-list"></div>
+            <div class="char-footer"><button class="btn-main" id="btn-confirm-character" style="margin:0; width:100%;">确定</button></div>
+        </div></div>
+
+        <div id="custom-board-overlay"><div class="custom-modal">
+            <h3>🛠️ 自定义棋局</h3>
+            <div class="custom-layout">
+                <div class="custom-board-wrapper"><canvas id="customCanvas" width="280" height="280"></canvas></div>
+                <div class="custom-controls">
+                    <div class="custom-control-group"><label>选择棋子 (点击放置/覆盖)</label>
+                        <div class="piece-picker" id="piece-picker">
+                            <div class="picker-opt" data-piece="wK">♔</div>
+                            <div class="picker-opt" data-piece="wQ">♕</div>
+                            <div class="picker-opt" data-piece="wR">♖</div>
+                            <div class="picker-opt" data-piece="wB">♗</div>
+                            <div class="picker-opt" data-piece="wN">♘</div>
+                            <div class="picker-opt" data-piece="wP">♙</div>
+                            <div class="picker-opt" data-piece="bK">♚</div>
+                            <div class="picker-opt" data-piece="bQ">♛</div>
+                            <div class="picker-opt" data-piece="bR">♜</div>
+                            <div class="picker-opt" data-piece="bB">♝</div>
+                            <div class="picker-opt" data-piece="bN">♞</div>
+                            <div class="picker-opt" data-piece="bP">♟</div>
+                            <div class="picker-opt" data-piece="none" style="font-size:14px;">✕ 移除</div>
+                        </div>
+                    </div>
+                    <div class="custom-control-group"><label>起始方</label>
+                        <div style="display:flex; gap:8px;">
+                            <button class="custom-opt active" data-start="white">白先</button>
+                            <button class="custom-opt" data-start="black">黑先</button>
+                        </div>
+                    </div>
+                    <div class="custom-control-group"><label>时间</label>
+                        <select id="custom-time-select" style="width:100%; padding:8px; border-radius:8px; background:#3d3d52; color:#f0e6d3; border:1px solid #5e5e7a;">
+                            <option value="inf">无限</option>
+                            <option value="900">15分钟</option>
+                            <option value="600" selected>10分钟</option>
+                            <option value="300">5分钟</option>
+                            <option value="60">1分钟</option>
+                            <option value="30">30秒</option>
+                        </select>
+                    </div>
+                    <div class="custom-control-group"><label>AI 角色</label>
+                        <select id="custom-char-select" style="width:100%; padding:8px; border-radius:8px; background:#3d3d52; color:#f0e6d3; border:1px solid #5e5e7a;">
+                            <option value="1">AI：1</option>
+                            <option value="2">AI：2</option>
+                            <option value="3" selected>AI：3 (强力)</option>
+                            <option value="4">AI：4 (满算力)</option>
+                            <option value="5">AI：4pro (算力解放)</option>
+                        </select>
+                    </div>
+                    <div class="custom-actions">
+                        <button id="btn-clear-board">🗑️ 清空</button>
+                        <button id="btn-start-custom-game" class="btn-main">开始对局</button>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+
+        <div id="settings-overlay"><div class="modal">
+            <h3>🎨 外观定制</h3>
+            <div class="settings-group"><label>预设主题</label>
+                <div class="options-grid" id="theme-options">
+                    <span class="opt selected" data-theme="classic">经典</span>
+                    <span class="opt" data-theme="ocean">海洋</span>
+                    <span class="opt" data-theme="forest">森林</span>
+                    <span class="opt" data-theme="night">夜间</span>
+                    <span class="opt" data-theme="lightgray">浅灰</span>
+                    <span class="opt" data-theme="blackwhite">黑白</span>
+                </div>
+            </div>
+            <div class="settings-group" id="color-group">
+                <label>棋盘与棋子配色</label>
+                <div class="color-section"><label>亮格</label><div class="color-inputs"><input type="color" id="c-light"><input type="text" id="t-light" value="#f0d9b5"></div></div>
+                <div class="color-section"><label>暗格</label><div class="color-inputs"><input type="color" id="c-dark"><input type="text" id="t-dark" value="#b58863"></div></div>
+                <div class="color-section"><label>白方棋子</label><div class="color-inputs"><input type="color" id="c-white"><input type="text" id="t-white" value="#ffffff"></div></div>
+                <div class="color-section"><label>黑方棋子</label><div class="color-inputs"><input type="color" id="c-black"><input type="text" id="t-black" value="#1a1a1a"></div></div>
+                <label style="margin-top:12px;">特效与光晕</label>
+                <div class="color-section"><label>被将军/失败</label><div class="color-inputs"><input type="color" id="c-glow-lose"><input type="text" id="t-glow-lose" value="#ff0000"></div></div>
+                <div class="color-section"><label>胜利</label><div class="color-inputs"><input type="color" id="c-glow-win"><input type="text" id="t-glow-win" value="#ffd700"></div></div>
+                <label style="margin-top:12px;">走棋标记色块</label>
+                <div class="color-section"><label>移动后</label><div class="color-inputs"><input type="color" id="c-hl-move"><input type="text" id="t-hl-move" value="#ffff00"></div></div>
+                <div class="color-section"><label>提前步</label><div class="color-inputs"><input type="color" id="c-hl-premove"><input type="text" id="t-hl-premove" value="#0000ff"></div></div>
+            </div>
+            <button class="btn-main" id="btn-apply-settings">应用并关闭</button>
+        </div></div>
+
+        <div id="promotion-overlay">
+            <div class="promo-opt" data-type="queen">♕</div>
+            <div class="promo-opt" data-type="rook">♖</div>
+            <div class="promo-opt" data-type="bishop">♗</div>
+            <div class="promo-opt" data-type="knight">♘</div>
+        </div>
+
+        <div id="game-page" class="page">
+            <div class="player-panel" id="ai-panel">
+                <div class="panel-header">
+                    <div class="chat-bubble" id="ai-chat-bubble"><span id="ai-chat-text">思考中...</span></div>
+                    <span class="label">🤖 AI</span>
+                    <span class="time-display" id="ai-time-display">∞</span>
+                </div>
+                <div class="progress-bar-container"><div class="progress-fill" id="ai-progress" style="display:none;"></div></div>
+                <div class="captured-display" id="ai-captured"><span class="pieces" id="ai-captured-pieces"></span><span class="score" id="ai-captured-score"></span></div>
+            </div>
+            <div class="board-wrapper" id="board-wrapper">
+                <canvas id="chessCanvas" width="560" height="560"></canvas>
+                <div id="anim-overlay"></div>
+            </div>
+            <div class="player-panel" id="player-panel">
+                <div class="panel-header"><span class="label">👤 玩家</span><span class="time-display" id="player-time-display">∞</span></div>
+                <div class="progress-bar-container"><div class="progress-fill" id="player-progress" style="display:none;"></div></div>
+                <div class="captured-display" id="player-captured"><span class="pieces" id="player-captured-pieces"></span><span class="score" id="player-captured-score"></span></div>
+            </div>
+            <div class="player-panel" id="control-panel" style="padding:8px 18px; display:flex; justify-content:flex-start;">
+                <button class="btn-back" id="btn-back">← 返回</button>
+            </div>
+            <div class="key-hint">快捷键 <kbd>R</kbd> 重新开局。右键点击可取消预走棋。</div>
+        </div>
+    </div>
+
+    <script>
+        console.log("✅ 国际象棋引擎启动中...");
+
+        const COLORS = { WHITE: 'white', BLACK: 'black' };
+        const PIECES = { KING: 'king', QUEEN: 'queen', ROOK: 'rook', BISHOP: 'bishop', KNIGHT: 'knight', PAWN: 'pawn' };
+        const PIECE_UNICODE = {
+            white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
+            black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' }
+        };
+        const PIECE_VALUES = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, king: 1000 };
+        const PST = {
+            pawn: [[0,0,0,0,0,0,0,0],[5,5,5,5,5,5,5,5],[1,1,2,3,3,2,1,1],[0,0,1,2,2,1,0,0],[0,0,0,1,1,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]],
+            knight: [[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,1,2,2,2,2,1,0],[0,2,3,4,4,3,2,0],[0,2,4,5,5,4,2,0],[0,2,3,4,4,3,2,0],[0,1,2,2,2,2,1,0],[0,0,0,0,0,0,0,0]],
+            bishop: [[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,1,2,2,1,0,0],[0,0,2,3,3,2,0,0],[0,0,2,3,3,2,0,0],[0,0,1,2,2,1,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]],
+            rook: [[0,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]],
+            queen: [[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,1,1,1,1,0,0],[0,0,1,2,2,1,0,0],[0,0,1,2,2,1,0,0],[0,0,1,1,1,1,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]
+        };
+        const PROMO_TYPES = [PIECES.QUEEN, PIECES.ROOK, PIECES.BISHOP, PIECES.KNIGHT];
+
+        function createInitialBoardState() {
+            const board = [];
+            for (let r = 0; r < 8; r++) { board[r] = []; for (let c = 0; c < 8; c++) board[r][c] = null; }
+            const backRank = [PIECES.ROOK, PIECES.KNIGHT, PIECES.BISHOP, PIECES.QUEEN, PIECES.KING, PIECES.BISHOP, PIECES.KNIGHT, PIECES.ROOK];
+            for (let c = 0; c < 8; c++) {
+                board[0][c] = { type: backRank[c], color: COLORS.BLACK };
+                board[1][c] = { type: PIECES.PAWN, color: COLORS.BLACK };
+                board[6][c] = { type: PIECES.PAWN, color: COLORS.WHITE };
+                board[7][c] = { type: backRank[c], color: COLORS.WHITE };
+            }
+            return {
+                board: board,
+                kingMoved: { white: false, black: false },
+                rookMoved: { whiteK: false, whiteQ: false, blackK: false, blackQ: false }
+            };
+        }
+
+        function cloneState(state) {
+            return {
+                board: state.board.map(row => row.map(cell => cell ? { ...cell } : null)),
+                kingMoved: { ...state.kingMoved },
+                rookMoved: { ...state.rookMoved }
+            };
+        }
+
+        function findKing(state, color) {
+            const board = state.board;
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = board[r][c];
+                if (p && p.type === PIECES.KING && p.color === color) return { row: r, col: c };
+            }
+            return null;
+        }
+
+        function inBounds(r, c) { return r >= 0 && r < 8 && c >= 0 && c < 8; }
+        function isFriend(piece, color) { return piece && piece.color === color; }
+        function getUnicode(piece) { return piece ? PIECE_UNICODE[piece.color]?.[piece.type] || '' : ''; }
+
+        function generateRawMoves(state, row, col) {
+            const board = state.board;
+            const piece = board[row][col];
+            if (!piece) return [];
+            const { type, color } = piece;
+            const moves = [];
+            const enemy = color === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+            const addMove = (r, c) => { if (inBounds(r, c)) moves.push({ fromRow: row, fromCol: col, toRow: r, toCol: c }); };
+            const addSliding = (dirs) => {
+                for (const [dr, dc] of dirs) {
+                    let r = row + dr, c = col + dc;
+                    while (inBounds(r, c)) {
+                        const target = board[r][c];
+                        if (target) {
+                            if (target.color === enemy) moves.push({ fromRow: row, fromCol: col, toRow: r, toCol: c });
+                            break;
+                        }
+                        moves.push({ fromRow: row, fromCol: col, toRow: r, toCol: c });
+                        r += dr; c += dc;
+                    }
+                }
+            };
+            if (type === PIECES.PAWN) {
+                const dir = color === COLORS.WHITE ? -1 : 1;
+                const startRow = color === COLORS.WHITE ? 6 : 1;
+                if (inBounds(row + dir, col) && !board[row + dir][col]) {
+                    addMove(row + dir, col);
+                    if (row === startRow && !board[row + 2 * dir][col]) addMove(row + 2 * dir, col);
+                }
+                for (const dc of [-1, 1]) {
+                    const nr = row + dir, nc = col + dc;
+                    if (inBounds(nr, nc)) {
+                        const target = board[nr][nc];
+                        if (target && target.color === enemy) moves.push({ fromRow: row, fromCol: col, toRow: nr, toCol: nc });
+                    }
+                }
+            } else if (type === PIECES.KNIGHT) {
+                for (const [dr, dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]) {
+                    const nr = row + dr, nc = col + dc;
+                    if (inBounds(nr, nc) && !isFriend(board[nr][nc], color)) addMove(nr, nc);
+                }
+            } else if (type === PIECES.BISHOP) addSliding([[-1,-1],[-1,1],[1,-1],[1,1]]);
+            else if (type === PIECES.ROOK) addSliding([[-1,0],[1,0],[0,-1],[0,1]]);
+            else if (type === PIECES.QUEEN) addSliding([[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]);
+            else if (type === PIECES.KING) {
+                for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
+                    const nr = row + dr, nc = col + dc;
+                    if (inBounds(nr, nc) && !isFriend(board[nr][nc], color)) addMove(nr, nc);
+                }
+            }
+            return moves;
+        }
+
+        function makeMoveState(state, move) {
+            const newState = cloneState(state);
+            const board = newState.board;
+            const piece = board[move.fromRow][move.fromCol];
+            if (!piece) return null;
+
+            if (piece.type === PIECES.KING) {
+                if (piece.color === COLORS.WHITE) newState.kingMoved.white = true;
+                else newState.kingMoved.black = true;
+            } else if (piece.type === PIECES.ROOK) {
+                const colorKey = piece.color === COLORS.WHITE ? 'white' : 'black';
+                const side = (move.fromRow === (piece.color === COLORS.WHITE ? 7 : 0)) ?
+                    (move.fromCol === 0 ? 'Q' : (move.fromCol === 7 ? 'K' : null)) : null;
+                if (side) {
+                    const key = colorKey + side;
+                    newState.rookMoved[key] = true;
+                }
+            }
+
+            if (move.castle) {
+                const row = move.fromRow;
+                if (move.castle === 'short') {
+                    board[row][6] = board[row][4];
+                    board[row][4] = null;
+                    board[row][5] = board[row][7];
+                    board[row][7] = null;
+                } else {
+                    board[row][2] = board[row][4];
+                    board[row][4] = null;
+                    board[row][3] = board[row][0];
+                    board[row][0] = null;
+                }
+                return newState;
+            }
+
+            board[move.toRow][move.toCol] = piece;
+            board[move.fromRow][move.fromCol] = null;
+            if (move.ep) {
+                board[move.fromRow][move.toCol] = null;
+            }
+            if (piece.type === PIECES.PAWN && (move.toRow === 0 || move.toRow === 7)) {
+                const promoType = move.promotion || PIECES.QUEEN;
+                board[move.toRow][move.toCol] = { type: promoType, color: piece.color };
+            }
+            return newState;
+        }
+
+        function isInCheck(state, color) {
+            const king = findKing(state, color);
+            if (!king) return true;
+            const enemy = color === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = state.board[r][c];
+                if (p && p.color === enemy) {
+                    const raw = generateRawMoves(state, r, c);
+                    for (const m of raw) if (m.toRow === king.row && m.toCol === king.col) return true;
+                }
+            }
+            return false;
+        }
+
+        function isSquareAttacked(state, row, col, byColor) {
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = state.board[r][c];
+                if (p && p.color === byColor) {
+                    const raw = generateRawMoves(state, r, c);
+                    for (const m of raw) if (m.toRow === row && m.toCol === col) return true;
+                }
+            }
+            return false;
+        }
+
+        function generateLegalMoves(state, row, col, lastMove) {
+            const board = state.board;
+            const piece = board[row][col];
+            if (!piece) return [];
+            const raw = generateRawMoves(state, row, col);
+            const legal = [];
+            const color = piece.color;
+            const enemy = color === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+
+            if (piece.type === PIECES.KING && !isInCheck(state, color)) {
+                const r = color === COLORS.WHITE ? 7 : 0;
+                const k = board[r][4];
+                if (k && k.type === PIECES.KING && k.color === color) {
+                    if (canCastle(state, color, 'short')) legal.push({ fromRow: r, fromCol: 4, toRow: r, toCol: 6, castle: 'short' });
+                    if (canCastle(state, color, 'long')) legal.push({ fromRow: r, fromCol: 4, toRow: r, toCol: 2, castle: 'long' });
+                }
+            }
+
+            if (piece.type === PIECES.PAWN && lastMove) {
+                const dir = color === COLORS.WHITE ? -1 : 1;
+                const startRow = color === COLORS.WHITE ? 3 : 4;
+                if (row === startRow) {
+                    for (const dc of [-1, 1]) {
+                        const nc = col + dc;
+                        if (!inBounds(row, nc)) continue;
+                        const epTarget = board[row][nc];
+                        if (epTarget && epTarget.type === PIECES.PAWN && epTarget.color === enemy) {
+                            if (lastMove.fromRow === row + (enemy === COLORS.WHITE ? 2 : -2) &&
+                                lastMove.fromCol === nc &&
+                                lastMove.toRow === row &&
+                                lastMove.toCol === nc) {
+                                legal.push({ fromRow: row, fromCol: col, toRow: row + dir, toCol: nc, ep: true });
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (const m of raw) {
+                const newState = makeMoveState(state, m);
+                if (!newState) continue;
+                if (isInCheck(newState, color)) continue;
+                const fromPiece = board[m.fromRow][m.fromCol];
+                if (fromPiece.type === PIECES.PAWN && (m.toRow === 0 || m.toRow === 7)) {
+                    for (const promo of PROMO_TYPES) {
+                        const promoMove = { ...m, promotion: promo };
+                        legal.push(promoMove);
+                    }
+                } else {
+                    legal.push(m);
+                }
+            }
+            return legal;
+        }
+
+        function canCastle(state, color, side) {
+            const row = color === COLORS.WHITE ? 7 : 0;
+            const enemy = color === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+            if (state.kingMoved[color]) return false;
+            const rookCol = side === 'short' ? 7 : 0;
+            const rm = color === COLORS.WHITE ? (side === 'short' ? state.rookMoved.whiteK : state.rookMoved.whiteQ) : (side === 'short' ? state.rookMoved.blackK : state.rookMoved.blackQ);
+            if (rm) return false;
+
+            const rook = state.board[row][rookCol];
+            if (!rook || rook.type !== PIECES.ROOK || rook.color !== color) return false;
+            if (isInCheck(state, color)) return false;
+            if (side === 'short') {
+                if (state.board[row][5] || state.board[row][6]) return false;
+                if (isSquareAttacked(state, row, 5, enemy)) return false;
+                if (isSquareAttacked(state, row, 6, enemy)) return false;
+                return true;
+            } else {
+                if (state.board[row][1] || state.board[row][2] || state.board[row][3]) return false;
+                if (isSquareAttacked(state, row, 3, enemy)) return false;
+                if (isSquareAttacked(state, row, 2, enemy)) return false;
+                return true;
+            }
+        }
+
+        function getAllLegalMoves(state, color, lastMove) {
+            const moves = [];
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = state.board[r][c];
+                if (p && p.color === color) {
+                    const ms = generateLegalMoves(state, r, c, lastMove);
+                    for (const m of ms) moves.push(m);
+                }
+            }
+            return moves;
+        }
+
+        function evaluateBoard(state) {
+            const board = state.board;
+            let score = 0;
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = board[r][c];
+                if (!p) continue;
+                let val = PIECE_VALUES[p.type] || 0;
+                if (PST[p.type]) {
+                    const row = p.color === COLORS.WHITE ? r : 7 - r;
+                    val += PST[p.type][row]?.[c] || 0;
+                }
+                score += (p.color === COLORS.WHITE ? 1 : -1) * val;
+            }
+            return score;
+        }
+
+        function sortMoves(moves, state) {
+            const board = state.board;
+            moves.sort((a, b) => {
+                const va = board[a.toRow]?.[a.toCol] ? PIECE_VALUES[board[a.toRow][a.toCol].type] : 0;
+                const vb = board[b.toRow]?.[b.toCol] ? PIECE_VALUES[board[b.toRow][b.toCol].type] : 0;
+                const promoteA = (board[a.fromRow][a.fromCol].type === PIECES.PAWN && (a.toRow === 0 || a.toRow === 7)) ? 1000 : 0;
+                const promoteB = (board[b.fromRow][b.fromCol].type === PIECES.PAWN && (b.toRow === 0 || b.toRow === 7)) ? 1000 : 0;
+                const castleA = a.castle ? 500 : 0; const castleB = b.castle ? 500 : 0;
+                return (vb + promoteB + castleB) - (va + promoteA + castleA);
+            });
+        }
+
+        // ======================== KRK 残局引擎 ========================
+        function getKRKMove(state, aiColor, lastMove) {
+            const enemy = aiColor === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+            let myKing = null, enemyKing = null, rook = null;
+            const board = state.board;
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const p = board[r][c];
+                    if (!p) continue;
+                    if (p.color === aiColor) {
+                        if (p.type === PIECES.KING) myKing = { row: r, col: c };
+                        else if (p.type === PIECES.ROOK) rook = { row: r, col: c };
+                    } else if (p.color === enemy && p.type === PIECES.KING) {
+                        enemyKing = { row: r, col: c };
+                    }
+                }
+            }
+            if (!myKing || !enemyKing || !rook) return null;
+
+            const curDist = Math.max(Math.abs(myKing.row - enemyKing.row), Math.abs(myKing.col - enemyKing.col));
+            const sameRow = myKing.row === enemyKing.row;
+            const sameCol = myKing.col === enemyKing.col;
+
+            const myMoves = generateLegalMoves(state, myKing.row, myKing.col, null);
+            const rookMoves = generateLegalMoves(state, rook.row, rook.col, null);
+
+            for (const m of rookMoves) {
+                const simState = makeMoveState(state, m);
+                if (!simState) continue;
+                const enemyMoves = getAllLegalMoves(simState, enemy, m);
+                if (enemyMoves.length === 0 && isInCheck(simState, enemy)) {
+                    return m;
+                }
+            }
+
+            if (curDist === 1 && (sameRow || sameCol)) {
+                let bestCheck = null;
+                let bestScore = -Infinity;
+                for (const m of rookMoves) {
+                    const simState = makeMoveState(state, m);
+                    if (!simState) continue;
+                    if (isInCheck(simState, enemy)) {
+                        if (isSquareAttacked(simState, m.toRow, m.toCol, enemy) && !isSquareAttacked(simState, m.toRow, m.toCol, aiColor)) {
+                            continue;
+                        }
+                        const enemyMoves = getAllLegalMoves(simState, enemy, m);
+                        let score = -enemyMoves.length * 1000;
+                        if (m.toRow === 0 || m.toRow === 7 || m.toCol === 0 || m.toCol === 7) {
+                            score += 2000;
+                        }
+                        if (lastMove && lastMove.fromRow === m.toRow && lastMove.fromCol === m.toCol && lastMove.toRow === m.fromRow && lastMove.toCol === m.fromCol) {
+                            score -= 5000;
+                        }
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestCheck = m;
+                        }
+                    }
+                }
+                if (bestCheck) return bestCheck;
+            }
+
+            if (curDist === 1 && !sameRow && !sameCol) {
+                let bestAdjust = null;
+                let bestAdjustScore = -Infinity;
+                for (const m of myMoves) {
+                    const simState = makeMoveState(state, m);
+                    if (!simState) continue;
+                    const newSameRow = m.toRow === enemyKing.row;
+                    const newSameCol = m.toCol === enemyKing.col;
+                    if (newSameRow || newSameCol) {
+                        let score = 8000;
+                        if (isSquareAttacked(simState, rook.row, rook.col, enemy) && !isSquareAttacked(simState, rook.row, rook.col, aiColor)) {
+                            score -= 10000;
+                        }
+                        if (score > bestAdjustScore) {
+                            bestAdjustScore = score;
+                            bestAdjust = m;
+                        }
+                    }
+                }
+                if (bestAdjust) return bestAdjust;
+            }
+
+            const allMoves = [...myMoves, ...rookMoves];
+            let bestMove = null;
+            let bestScore = -Infinity;
+
+            for (const m of allMoves) {
+                const simState = makeMoveState(state, m);
+                if (!simState) continue;
+                const enemyMoves = getAllLegalMoves(simState, enemy, m);
+                let score = -enemyMoves.length * 500;
+
+                const piece = board[m.fromRow][m.fromCol];
+
+                if (piece && piece.type === PIECES.KING) {
+                    const newDist = Math.max(Math.abs(m.toRow - enemyKing.row), Math.abs(m.toCol - enemyKing.col));
+                    const delta = newDist - curDist;
+                    if (delta > 0) {
+                        score -= 10000;
+                    } else if (delta === 0) {
+                        score += 2000;
+                    } else if (delta === -1) {
+                        score += 6000;
+                    } else if (delta <= -2) {
+                        score += 10000;
+                    }
+                    if (m.toRow !== m.fromRow && m.toCol !== m.fromCol) {
+                        score += 2000;
+                    }
+                    if (isSquareAttacked(simState, rook.row, rook.col, enemy) && !isSquareAttacked(simState, rook.row, rook.col, aiColor)) {
+                        score -= 10000;
+                    }
+                }
+
+                if (piece && piece.type === PIECES.ROOK) {
+                    if (isSquareAttacked(simState, m.toRow, m.toCol, enemy) && !isSquareAttacked(simState, m.toRow, m.toCol, aiColor)) {
+                        score -= 10000;
+                    }
+                    const isCheck = isInCheck(simState, enemy);
+                    if (isCheck) {
+                        if (curDist === 1 && (sameRow || sameCol)) {
+                            score += 15000;
+                        } else {
+                            score -= 5000;
+                        }
+                        if (lastMove && lastMove.fromRow === m.toRow && lastMove.fromCol === m.toCol && lastMove.toRow === m.fromRow && lastMove.toCol === m.fromCol) {
+                            score -= 5000;
+                        }
+                    }
+                    if (m.toRow === enemyKing.row || m.toCol === enemyKing.col) {
+                        score += 800;
+                    }
+                    if (m.toRow === 0 || m.toRow === 7 || m.toCol === 0 || m.toCol === 7) {
+                        score += 300;
+                    }
+                }
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = m;
+                }
+            }
+
+            if (!bestMove) {
+                if (myMoves.length > 0) return myMoves[0];
+                if (rookMoves.length > 0) return rookMoves[0];
+            }
+            return bestMove;
+        }
+
+        // ======================== KQK 单后杀王 ========================
+        function getKQKMove(state, aiColor, lastMove) {
+            const enemy = aiColor === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+            let myKing = null, enemyKing = null, queen = null;
+            const board = state.board;
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const p = board[r][c];
+                    if (!p) continue;
+                    if (p.color === aiColor) {
+                        if (p.type === PIECES.KING) myKing = { row: r, col: c };
+                        else if (p.type === PIECES.QUEEN) queen = { row: r, col: c };
+                    } else if (p.color === enemy && p.type === PIECES.KING) {
+                        enemyKing = { row: r, col: c };
+                    }
+                }
+            }
+            if (!myKing || !enemyKing || !queen) return null;
+
+            const curDist = Math.max(Math.abs(myKing.row - enemyKing.row), Math.abs(myKing.col - enemyKing.col));
+            const sameRow = myKing.row === enemyKing.row;
+            const sameCol = myKing.col === enemyKing.col;
+
+            const myMoves = generateLegalMoves(state, myKing.row, myKing.col, null);
+            const queenMoves = generateLegalMoves(state, queen.row, queen.col, null);
+
+            for (const m of queenMoves) {
+                const simState = makeMoveState(state, m);
+                if (!simState) continue;
+                const enemyMoves = getAllLegalMoves(simState, enemy, m);
+                if (enemyMoves.length === 0 && isInCheck(simState, enemy)) {
+                    return m;
+                }
+            }
+
+            if (curDist === 1 && (sameRow || sameCol)) {
+                let bestCheck = null;
+                let bestScore = -Infinity;
+                for (const m of queenMoves) {
+                    const simState = makeMoveState(state, m);
+                    if (!simState) continue;
+                    if (isInCheck(simState, enemy)) {
+                        if (isSquareAttacked(simState, m.toRow, m.toCol, enemy) && !isSquareAttacked(simState, m.toRow, m.toCol, aiColor)) {
+                            continue;
+                        }
+                        const enemyMoves = getAllLegalMoves(simState, enemy, m);
+                        let score = -enemyMoves.length * 1000;
+                        if (m.toRow === 0 || m.toRow === 7 || m.toCol === 0 || m.toCol === 7) {
+                            score += 2000;
+                        }
+                        if (lastMove && lastMove.fromRow === m.toRow && lastMove.fromCol === m.toCol && lastMove.toRow === m.fromRow && lastMove.toCol === m.fromCol) {
+                            score -= 5000;
+                        }
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestCheck = m;
+                        }
+                    }
+                }
+                if (bestCheck) return bestCheck;
+            }
+
+            if (curDist === 1 && !sameRow && !sameCol) {
+                let bestAdjust = null;
+                let bestAdjustScore = -Infinity;
+                for (const m of myMoves) {
+                    const simState = makeMoveState(state, m);
+                    if (!simState) continue;
+                    const newSameRow = m.toRow === enemyKing.row;
+                    const newSameCol = m.toCol === enemyKing.col;
+                    if (newSameRow || newSameCol) {
+                        let score = 8000;
+                        if (isSquareAttacked(simState, queen.row, queen.col, enemy) && !isSquareAttacked(simState, queen.row, queen.col, aiColor)) {
+                            score -= 10000;
+                        }
+                        if (score > bestAdjustScore) {
+                            bestAdjustScore = score;
+                            bestAdjust = m;
+                        }
+                    }
+                }
+                if (bestAdjust) return bestAdjust;
+            }
+
+            const allMoves = [...myMoves, ...queenMoves];
+            let bestMove = null;
+            let bestScore = -Infinity;
+
+            for (const m of allMoves) {
+                const simState = makeMoveState(state, m);
+                if (!simState) continue;
+                const enemyMoves = getAllLegalMoves(simState, enemy, m);
+                let score = -enemyMoves.length * 500;
+
+                const piece = board[m.fromRow][m.fromCol];
+
+                if (piece && piece.type === PIECES.KING) {
+                    const newDist = Math.max(Math.abs(m.toRow - enemyKing.row), Math.abs(m.toCol - enemyKing.col));
+                    const delta = newDist - curDist;
+                    if (delta > 0) {
+                        score -= 10000;
+                    } else if (delta === 0) {
+                        score += 2000;
+                    } else if (delta === -1) {
+                        score += 6000;
+                    } else if (delta <= -2) {
+                        score += 10000;
+                    }
+                    if (m.toRow !== m.fromRow && m.toCol !== m.fromCol) {
+                        score += 2000;
+                    }
+                    if (isSquareAttacked(simState, queen.row, queen.col, enemy) && !isSquareAttacked(simState, queen.row, queen.col, aiColor)) {
+                        score -= 10000;
+                    }
+                }
+
+                if (piece && piece.type === PIECES.QUEEN) {
+                    if (isSquareAttacked(simState, m.toRow, m.toCol, enemy) && !isSquareAttacked(simState, m.toRow, m.toCol, aiColor)) {
+                        score -= 10000;
+                    }
+                    const isCheck = isInCheck(simState, enemy);
+                    if (isCheck) {
+                        if (curDist === 1 && (sameRow || sameCol)) {
+                            score += 15000;
+                        } else {
+                            score -= 5000;
+                        }
+                        if (lastMove && lastMove.fromRow === m.toRow && lastMove.fromCol === m.toCol && lastMove.toRow === m.fromRow && lastMove.toCol === m.fromCol) {
+                            score -= 5000;
+                        }
+                    }
+                    if (m.toRow === enemyKing.row || m.toCol === enemyKing.col) {
+                        score += 800;
+                    }
+                    if (m.toRow === 0 || m.toRow === 7 || m.toCol === 0 || m.toCol === 7) {
+                        score += 300;
+                    }
+                }
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = m;
+                }
+            }
+
+            if (!bestMove) {
+                if (myMoves.length > 0) return myMoves[0];
+                if (queenMoves.length > 0) return queenMoves[0];
+            }
+            return bestMove;
+        }
+
+        // ======================== AI 核心 ========================
+        function getAIMove(state, aiColor, lastMove, maxDepthParam) {
+            let aiKingCount = 0, aiQueenCount = 0, aiRookCount = 0;
+            let enemyPieceCount = 0;
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const p = state.board[r][c];
+                    if (!p) continue;
+                    if (p.color === aiColor) {
+                        if (p.type === PIECES.KING) aiKingCount++;
+                        else if (p.type === PIECES.QUEEN) aiQueenCount++;
+                        else if (p.type === PIECES.ROOK) aiRookCount++;
+                    } else if (p.type !== PIECES.KING) {
+                        enemyPieceCount++;
+                    }
+                }
+            }
+            if (aiKingCount === 1 && aiQueenCount === 1 && enemyPieceCount === 0) {
+                return getKQKMove(state, aiColor, lastMove);
+            }
+            if (aiKingCount === 1 && aiRookCount === 1 && enemyPieceCount === 0) {
+                return getKRKMove(state, aiColor, lastMove);
+            }
+
+            const moves = getAllLegalMoves(state, aiColor, lastMove);
+            if (moves.length === 0) return null;
+            for (let i = 0; i < moves.length; i++) {
+                const newState = makeMoveState(state, moves[i]);
+                if (!newState) continue;
+                const opponent = aiColor === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+                const opMoves = getAllLegalMoves(newState, opponent, moves[i]);
+                if (opMoves.length === 0 && isInCheck(newState, opponent)) {
+                    return moves[i];
+                }
+            }
+
+            const startTime = Date.now();
+            let bestMove = moves[0];
+            sortMoves(moves, state);
+
+            let maxDepth = maxDepthParam;
+            let timeLimit = 300;
+            if (maxDepth === 4) timeLimit = 10000;
+            else if (maxDepth === 3) timeLimit = 5000;
+            else if (maxDepth === 2) timeLimit = 1000;
+
+            if (maxDepthParam === 5) { // 4pro
+                maxDepth = 5;
+                timeLimit = Infinity;
+            }
+
+            for (let depth = 1; depth <= maxDepth; depth++) {
+                let localBestMove = null, localBestScore = -Infinity, alpha = -Infinity, beta = Infinity;
+                let depthCompleted = true;
+                for (const move of moves) {
+                    const newState = makeMoveState(state, move);
+                    if (!newState) continue;
+                    const score = minimax(newState, depth - 1, false, alpha, beta, aiColor, move, startTime, timeLimit);
+                    if (score > localBestScore) {
+                        localBestScore = score;
+                        localBestMove = move;
+                    }
+                    if (score > alpha) alpha = score;
+                    if (beta <= alpha) break;
+                    if (Date.now() - startTime > timeLimit) { depthCompleted = false; break; }
+                }
+                if (localBestMove) bestMove = localBestMove;
+                if (!depthCompleted) break;
+            }
+            return bestMove;
+        }
+
+        function minimax(state, depth, isMaximizing, alpha, beta, aiColor, lastMove, startTime, timeLimit) {
+            if (Date.now() - startTime > timeLimit) return evaluateBoard(state) * (aiColor === COLORS.WHITE ? 1 : -1);
+            const color = isMaximizing ? aiColor : (aiColor === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+            const moves = getAllLegalMoves(state, color, lastMove);
+            if (moves.length === 0) {
+                if (isInCheck(state, color)) return isMaximizing ? -9999 + (3 - depth) : 9999 - (3 - depth);
+                return 0;
+            }
+            if (depth === 0) return evaluateBoard(state) * (aiColor === COLORS.WHITE ? 1 : -1);
+            sortMoves(moves, state);
+            let best = isMaximizing ? -Infinity : Infinity;
+            for (const move of moves) {
+                const newState = makeMoveState(state, move);
+                if (!newState) continue;
+                const score = minimax(newState, depth - 1, !isMaximizing, alpha, beta, aiColor, move, startTime, timeLimit);
+                if (isMaximizing) { best = Math.max(best, score); alpha = Math.max(alpha, best); }
+                else { best = Math.min(best, score); beta = Math.min(beta, best); }
+                if (beta <= alpha) break;
+            }
+            return best;
+        }
+
+        // ======================== 大幅扩充的开局库 ========================
+        const OPENINGS = {
+            "": { "e2e4":null, "d2d4":null, "g1f3":null, "c2c4":null },
+            "e2e4": { "e7e5":null, "c7c5":null, "e7e6":null, "c7c6":null },
+            "e2e4,e7e5": { "g1f3":null, "f1c4":null, "d2d4":null, "b1c3":null },
+            "e2e4,e7e5,g1f3": { "b8c6":null, "g8f6":null, "d7d6":null },
+            "e2e4,e7e5,g1f3,b8c6": { "f1b5":null, "f1c4":null, "d2d4":null },
+            "e2e4,e7e5,g1f3,b8c6,f1b5": { "a7a6":null, "g8f6":null, "d7d6":null },
+            "e2e4,e7e5,g1f3,b8c6,f1b5,a7a6": { "b5a4":null, "b5c4":null },
+            "e2e4,e7e5,g1f3,b8c6,f1b5,a7a6,b5a4": { "g8f6":null, "b8c6":null, "d7d6":null },
+            "e2e4,e7e5,g1f3,b8c6,f1b5,a7a6,b5a4,g8f6": { "e1g1":null, "d2d4":null, "d2d3":null },
+            "e2e4,e7e5,g1f3,b8c6,f1b5,a7a6,b5a4,g8f6,e1g1": { "f8e7":null, "d7d6":null },
+            "e2e4,e7e5,g1f3,b8c6,f1b5,a7a6,b5a4,g8f6,e1g1,f8e7": { "d2d4":null, "d2d3":null, "f1e1":null },
+            // Berlin Defense
+            "e2e4,e7e5,g1f3,b8c6,f1b5,g8f6": { "e1g1":null, "d2d4":null, "b5c6":null },
+            "e2e4,e7e5,g1f3,b8c6,f1b5,g8f6,e1g1": { "f8e7":null, "d7d6":null, "g8e4":null },
+            // Scottish / Italian
+            "e2e4,e7e5,g1f3,b8c6,d2d4": { "e5d4":null },
+            "e2e4,e7e5,g1f3,b8c6,f1c4": { "g8f6":null, "f8c5":null },
+            // Sicilian
+            "e2e4,c7c5": { "g1f3":null, "d2d4":null, "b1c3":null },
+            "e2e4,c7c5,g1f3": { "d7d6":null, "b8c6":null, "e7e6":null },
+            "e2e4,c7c5,g1f3,d7d6": { "d2d4":null, "b1c3":null },
+            "e2e4,c7c5,g1f3,d7d6,d2d4": { "c5d4":null },
+            "e2e4,c7c5,g1f3,d7d6,d2d4,c5d4": { "f3d4":null },
+            "e2e4,c7c5,g1f3,d7d6,d2d4,c5d4,f3d4": { "g8f6":null, "b8c6":null },
+            "e2e4,c7c5,g1f3,d7d6,d2d4,c5d4,f3d4,g8f6": { "b1c3":null },
+            "e2e4,c7c5,g1f3,d7d6,d2d4,c5d4,f3d4,g8f6,b1c3": { "a7a6":null, "e7e6":null, "g7g6":null },
+            "e2e4,c7c5,g1f3,d7d6,d2d4,c5d4,f3d4,g8f6,b1c3,a7a6": { "c1g5":null, "f1e2":null, "f3e3":null },
+            "e2e4,c7c5,g1f3,d7d6,d2d4,c5d4,f3d4,g8f6,b1c3,a7a6,c1g5": { "e7e6":null, "b8d7":null },
+            // French Defense
+            "e2e4,e7e6": { "d2d4":null, "d2d3":null },
+            "e2e4,e7e6,d2d4": { "d7d5":null },
+            "e2e4,e7e6,d2d4,d7d5": { "b1c3":null, "e4d5":null, "e4e5":null },
+            "e2e4,e7e6,d2d4,d7d5,b1c3": { "g8f6":null, "f8b4":null },
+            "e2e4,e7e6,d2d4,d7d5,b1c3,f8b4": { "e4e5":null, "f1d3":null },
+            "e2e4,e7e6,d2d4,d7d5,b1c3,f8b4,e4e5": { "c7c5":null },
+            "e2e4,e7e6,d2d4,d7d5,b1c3,g8f6": { "e4e5":null, "c1g5":null },
+            // Caro-Kann
+            "e2e4,c7c6": { "d2d4":null, "g1f3":null },
+            "e2e4,c7c6,d2d4": { "d7d5":null },
+            "e2e4,c7c6,d2d4,d7d5": { "e4d5":null, "b1c3":null, "e4e5":null },
+            "e2e4,c7c6,d2d4,d7d5,e4d5": { "c6d5":null },
+            "e2e4,c7c6,d2d4,d7d5,b1c3": { "d5e4":null, "g8f6":null },
+            // Queen's Gambit
+            "d2d4": { "d7d5":null, "g8f6":null, "e7e6":null, "c7c5":null },
+            "d2d4,d7d5": { "c2c4":null, "g1f3":null },
+            "d2d4,d7d5,c2c4": { "e7e6":null, "c7c6":null, "d5c4":null, "g8f6":null },
+            "d2d4,d7d5,c2c4,e7e6": { "b1c3":null, "g1f3":null },
+            "d2d4,d7d5,c2c4,e7e6,b1c3": { "g8f6":null, "c7c6":null },
+            "d2d4,d7d5,c2c4,e7e6,b1c3,g8f6": { "c1g5":null, "g1f3":null },
+            "d2d4,d7d5,c2c4,e7e6,b1c3,g8f6,c1g5": { "f8e7":null, "d5c4":null },
+            "d2d4,d7d5,c2c4,e7e6,b1c3,g8f6,c1g5,f8e7": { "e2e3":null, "g1f3":null },
+            "d2d4,d7d5,c2c4,e7e6,b1c3,g8f6,g1f3": { "f8e7":null, "d5c4":null },
+            "d2d4,d7d5,c2c4,c7c6": { "g1f3":null, "c4d5":null },
+            "d2d4,d7d5,c2c4,c7c6,g1f3": { "g8f6":null, "d5c4":null },
+            "d2d4,d7d5,c2c4,d5c4": { "e2e3":null, "g1f3":null, "e2e4":null },
+            "d2d4,d7d5,c2c4,d5c4,e2e3": { "e7e5":null, "g8f6":null },
+            // King's Indian
+            "d2d4,g8f6": { "c2c4":null, "g1f3":null },
+            "d2d4,g8f6,c2c4": { "e7e6":null, "g7g6":null, "d7d5":null },
+            "d2d4,g8f6,c2c4,g7g6": { "b1c3":null, "g1f3":null },
+            "d2d4,g8f6,c2c4,g7g6,b1c3": { "f8g7":null },
+            "d2d4,g8f6,c2c4,g7g6,b1c3,f8g7": { "e2e4":null, "g1f3":null },
+            "d2d4,g8f6,c2c4,g7g6,b1c3,f8g7,e2e4": { "d7d6":null },
+            "d2d4,g8f6,c2c4,g7g6,b1c3,f8g7,e2e4,d7d6": { "g1f3":null },
+            "d2d4,g8f6,c2c4,g7g6,b1c3,f8g7,e2e4,d7d6,g1f3": { "e1g1":null },
+            "d2d4,g8f6,c2c4,g7g6,b1c3,f8g7,e2e4,d7d6,g1f3,e1g1": { "f1e2":null },
+            "d2d4,g8f6,c2c4,g7g6,b1c3,f8g7,e2e4,d7d6,g1f3,e1g1,f1e2": { "e7e5":null },
+            // Nimzo-Indian
+            "d2d4,g8f6,c2c4,e7e6": { "b1c3":null, "g1f3":null },
+            "d2d4,g8f6,c2c4,e7e6,b1c3": { "f8b4":null },
+            "d2d4,g8f6,c2c4,e7e6,b1c3,f8b4": { "e2e3":null, "g1f3":null, "d1c2":null },
+            // English
+            "c2c4": { "e7e5":null, "g8f6":null, "c7c5":null },
+            "c2c4,e7e5": { "b1c3":null, "g1f3":null },
+            "c2c4,e7e5,b1c3": { "g8f6":null, "b8c6":null },
+            "c2c4,e7e5,b1c3,g8f6": { "g1f3":null, "e2e4":null },
+            "c2c4,e7e5,b1c3,g8f6,g1f3": { "b8c6":null },
+            // Dutch
+            "d2d4,f7f5": { "c2c4":null, "g1f3":null },
+            // London System
+            "d2d4,d7d5,c1f4": { "g8f6":null, "e7e6":null }
+        };
+
+        function getBookMove(moveHistory) {
+            const path = moveHistory.map(m => getUciFromMove(m)).join(",");
+            let bestMatch = "";
+            const subKeys = Object.keys(OPENINGS);
+            for (const key of subKeys) {
+                if (path.startsWith(key) && key.length > bestMatch.length) {
+                    bestMatch = key;
+                }
+            }
+            if (bestMatch && OPENINGS[bestMatch]) {
+                const nextMoves = Object.keys(OPENINGS[bestMatch]);
+                if (nextMoves.length > 0) {
+                    return nextMoves[Math.floor(Math.random() * nextMoves.length)];
+                }
+            }
+            return null;
+        }
+
+        function uciToColRow(uci) {
+            if (!uci || uci.length !== 4) return null;
+            const col = uci.charCodeAt(0) - 97;
+            const row = 8 - parseInt(uci[1]);
+            const toCol = uci.charCodeAt(2) - 97;
+            const toRow = 8 - parseInt(uci[3]);
+            return { fromCol: col, fromRow: row, toCol: toCol, toRow: toRow };
+        }
+        function getUciFromMove(move) {
+            const cols = "abcdefgh";
+            const rows = "87654321";
+            return cols[move.fromCol] + rows[move.fromRow] + cols[move.toCol] + rows[move.toRow];
+        }
+
+        // ======================== 配色设置 ========================
+        let settings = {
+            lightSquare: '#f0d9b5', darkSquare: '#b58863',
+            whitePiece: '#ffffff', blackPiece: '#1a1a1a',
+            glowLose: '#ff0000', glowWin: '#ffd700',
+            moveHighlight: '#ffff00', premoveHighlight: '#0000ff'
+        };
+        const THEMES = {
+            classic: { lightSquare: '#f0d9b5', darkSquare: '#b58863', whitePiece: '#ffffff', blackPiece: '#1a1a1a', glowLose: '#ff0000', glowWin: '#ffd700', moveHighlight: '#ffff00', premoveHighlight: '#0000ff' },
+            ocean: { lightSquare: '#d8e5e8', darkSquare: '#4a8b96', whitePiece: '#ffffff', blackPiece: '#1a1a1a', glowLose: '#ff4444', glowWin: '#ffcc00', moveHighlight: '#00ffee', premoveHighlight: '#ff00ff' },
+            forest: { lightSquare: '#e3e0c2', darkSquare: '#4b6f4b', whitePiece: '#f0e6d3', blackPiece: '#2b2b3a', glowLose: '#cc3333', glowWin: '#d4af37', moveHighlight: '#aaffaa', premoveHighlight: '#aaaaff' },
+            night: { lightSquare: '#2c2c4a', darkSquare: '#1a1a2e', whitePiece: '#f0e6d3', blackPiece: '#a0a0a0', glowLose: '#ff3333', glowWin: '#ffcc00', moveHighlight: '#8888ff', premoveHighlight: '#ff88ff' },
+            lightgray: { lightSquare: '#f0f0f0', darkSquare: '#d0d0d0', whitePiece: '#ffffff', blackPiece: '#1a1a1a', glowLose: '#ff0000', glowWin: '#ffd700', moveHighlight: '#ffff00', premoveHighlight: '#0000ff' },
+            blackwhite: { lightSquare: '#ffffff', darkSquare: '#000000', whitePiece: '#f0e6d3', blackPiece: '#222222', glowLose: '#ff0000', glowWin: '#ffd700', moveHighlight: '#ffff00', premoveHighlight: '#0000ff' }
+        };
+        function updateSettingsFromUI() {
+            settings.lightSquare = document.getElementById('c-light').value;
+            settings.darkSquare = document.getElementById('c-dark').value;
+            settings.whitePiece = document.getElementById('c-white').value;
+            settings.blackPiece = document.getElementById('c-black').value;
+            settings.glowLose = document.getElementById('c-glow-lose').value;
+            settings.glowWin = document.getElementById('c-glow-win').value;
+            settings.moveHighlight = document.getElementById('c-hl-move').value;
+            settings.premoveHighlight = document.getElementById('c-hl-premove').value;
+            if (game.state) render();
+        }
+        function setTheme(themeName) {
+            const t = THEMES[themeName];
+            if (!t) return;
+            document.getElementById('c-light').value = t.lightSquare; document.getElementById('t-light').value = t.lightSquare;
+            document.getElementById('c-dark').value = t.darkSquare; document.getElementById('t-dark').value = t.darkSquare;
+            document.getElementById('c-white').value = t.whitePiece; document.getElementById('t-white').value = t.whitePiece;
+            document.getElementById('c-black').value = t.blackPiece; document.getElementById('t-black').value = t.blackPiece;
+            document.getElementById('c-glow-lose').value = t.glowLose; document.getElementById('t-glow-lose').value = t.glowLose;
+            document.getElementById('c-glow-win').value = t.glowWin; document.getElementById('t-glow-win').value = t.glowWin;
+            document.getElementById('c-hl-move').value = t.moveHighlight; document.getElementById('t-hl-move').value = t.moveHighlight;
+            document.getElementById('c-hl-premove').value = t.premoveHighlight; document.getElementById('t-hl-premove').value = t.premoveHighlight;
+            updateSettingsFromUI();
+        }
+        function bindTextInput(idColor, idText) {
+            document.getElementById(idText).addEventListener('input', function(e) {
+                let val = e.target.value;
+                if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+                    document.getElementById(idColor).value = val;
+                    updateSettingsFromUI();
+                }
+            });
+            document.getElementById(idColor).addEventListener('input', function(e) {
+                document.getElementById(idText).value = e.target.value;
+                updateSettingsFromUI();
+            });
+        }
+
+        // ======================== UI 与游戏状态 ========================
+        const canvas = document.getElementById('chessCanvas');
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('anim-overlay');
+        const boardWrapper = document.getElementById('board-wrapper');
+        const playerTimeDisplay = document.getElementById('player-time-display');
+        const aiTimeDisplay = document.getElementById('ai-time-display');
+        const playerProgress = document.getElementById('player-progress');
+        const aiProgress = document.getElementById('ai-progress');
+        const aiCapturedPieces = document.getElementById('ai-captured-pieces');
+        const aiCapturedScore = document.getElementById('ai-captured-score');
+        const playerCapturedPieces = document.getElementById('player-captured-pieces');
+        const playerCapturedScore = document.getElementById('player-captured-score');
+        const aiChatBubble = document.getElementById('ai-chat-bubble');
+        const aiChatText = document.getElementById('ai-chat-text');
+        const selectedCharNameSpan = document.getElementById('selected-character-name');
+
+        let game = {
+            state: null,
+            turn: COLORS.WHITE,
+            selected: null,
+            legalMoves: [],
+            gameOver: false,
+            isAIThinking: false,
+            aiColor: COLORS.BLACK,
+            playerColor: COLORS.WHITE,
+            moveCount: 0,
+            lastMove: null,
+            animating: false,
+            totalWhiteTime: 600000,
+            totalBlackTime: 600000,
+            whiteTime: 600000,
+            blackTime: 600000,
+            aiDifficulty: 3,
+            winner: null,
+            endReason: null,
+            moveHistory: [],
+            repetitionCount: {},
+            premove: null,
+            isExecutingPremove: false,
+            isPremoveExecution: false,
+            pendingMove: null,
+            pendingCallback: null,
+            captured: { white: [], black: [] }
+        };
+
+        let selectedCharacter = { id: 3, name: 'AI：3 (强力)', desc: '等级三的AI。战术意识显著增强。' };
+        const CHARACTERS = [
+            { id: 1, name: 'AI：1', desc: '等级一的AI。反应迅速，适合新手练手。' },
+            { id: 2, name: 'AI：2', desc: '等级二的AI。开始有策略性思考。' },
+            { id: 3, name: 'AI：3 (强力)', desc: '等级三的AI。战术意识显著增强。' },
+            { id: 4, name: 'AI：4 (满算力)', desc: '等级四的AI。满算力，具备深度计算能力。' },
+            { id: 5, name: 'AI：4pro (算力解放)', desc: '解除搜索限制，深度5全力搜索，发现必杀立即执行。' }
+        ];
+        let customBoard = null;
+        let customStartColor = COLORS.WHITE;
+        let selectedPickerPiece = null;
+
+        // ---------- 动画控制 ----------
+        let isAnimating = false;
+
+        function openOverlay(overlayId, onComplete) {
+            if (isAnimating) return;
+            const overlay = document.getElementById(overlayId);
+            if (!overlay || overlay.classList.contains('active')) {
+                if (onComplete) onComplete();
+                return;
+            }
+
+            ['setup-overlay', 'settings-overlay', 'character-overlay', 'custom-board-overlay'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el !== overlay && el.classList.contains('active')) {
+                    el.classList.remove('active');
+                    el.classList.remove('closing');
+                    el.style.display = 'none';
+                }
+            });
+
+            isAnimating = true;
+            overlay.style.display = 'flex';
+            void overlay.offsetHeight;
+            overlay.classList.add('active');
+
+            const onEnd = () => {
+                overlay.removeEventListener('animationend', onEnd);
+                overlay.style.pointerEvents = 'auto';
+                isAnimating = false;
+                if (onComplete) onComplete();
+            };
+            overlay.addEventListener('animationend', onEnd);
+        }
+
+        function closeOverlay(overlayId, callback) {
+            if (isAnimating) {
+                if (callback) setTimeout(callback, 200);
+                return;
+            }
+            const overlay = document.getElementById(overlayId);
+            if (!overlay || !overlay.classList.contains('active')) {
+                if (callback) callback();
+                return;
+            }
+
+            isAnimating = true;
+            overlay.classList.remove('active');
+            overlay.classList.add('closing');
+            overlay.style.pointerEvents = 'none';
+
+            const onEnd = () => {
+                overlay.removeEventListener('animationend', onEnd);
+                overlay.classList.remove('closing');
+                overlay.style.display = 'none';
+                isAnimating = false;
+                if (callback) callback();
+            };
+            overlay.addEventListener('animationend', onEnd);
+        }
+
+        function render() {
+            const size = canvas.width;
+            const cellSize = size / 8;
+            if (!game.state) return;
+            const board = game.state.board;
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const isLight = (r + c) % 2 === 0;
+                ctx.fillStyle = isLight ? settings.lightSquare : settings.darkSquare;
+                ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+            }
+
+            if (!game.animating) {
+                if (game.lastMove) {
+                    ctx.fillStyle = hexToRgba(settings.moveHighlight, 0.5);
+                    ctx.fillRect(game.lastMove.fromCol * cellSize, game.lastMove.fromRow * cellSize, cellSize, cellSize);
+                    ctx.fillRect(game.lastMove.toCol * cellSize, game.lastMove.toRow * cellSize, cellSize, cellSize);
+                }
+                if (game.premove && game.turn === game.aiColor) {
+                    ctx.fillStyle = hexToRgba(settings.premoveHighlight, 0.5);
+                    ctx.fillRect(game.premove.toCol * cellSize, game.premove.toRow * cellSize, cellSize, cellSize);
+                }
+            }
+
+            if (game.selected) {
+                for (const m of game.legalMoves) {
+                    const tr = m.toRow, tc = m.toCol;
+                    const target = board[tr][tc];
+                    ctx.beginPath();
+                    if (target) {
+                        ctx.arc(tc * cellSize + cellSize / 2, tr * cellSize + cellSize / 2, cellSize * 0.38, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.35)';
+                        ctx.fill();
+                    } else {
+                        ctx.arc(tc * cellSize + cellSize / 2, tr * cellSize + cellSize / 2, cellSize * 0.16, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                        ctx.fill();
+                    }
+                }
+            }
+
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = board[r][c];
+                if (!p) continue;
+                const unicode = PIECE_UNICODE[p.color][p.type];
+                ctx.font = `${cellSize * 0.78}px 'Segoe UI', 'Arial Unicode MS', 'Noto Sans', sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 8;
+                ctx.fillStyle = p.color === COLORS.WHITE ? settings.whitePiece : settings.blackPiece;
+                ctx.fillText(unicode, c * cellSize + cellSize / 2, r * cellSize + cellSize / 2 + 2);
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = p.color === COLORS.WHITE ? '#b0a090' : '#404040';
+                ctx.lineWidth = 0.5;
+                ctx.strokeText(unicode, c * cellSize + cellSize / 2, r * cellSize + cellSize / 2 + 2);
+            }
+
+            if (game.gameOver) {
+                ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                ctx.fillRect(0, 0, size, size);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                ctx.shadowBlur = 20;
+                let mainMsg = '', subMsg = '', mainColor = '#f0e6d3';
+                if (game.winner === 'player') { mainMsg = '🎉 你胜利了！'; mainColor = '#ffd700'; subMsg = game.endReason || ''; }
+                else if (game.winner === 'ai') { mainMsg = '💀 你输了！'; mainColor = '#ff6b6b'; subMsg = game.endReason || ''; }
+                else if (game.winner === 'draw') { mainMsg = '🤝 平局'; subMsg = game.endReason || ''; }
+                ctx.font = 'bold 46px sans-serif';
+                ctx.fillStyle = mainColor;
+                ctx.fillText(mainMsg, size / 2, size / 2 - 25);
+                ctx.font = 'bold 26px sans-serif';
+                ctx.fillStyle = '#f0e6d3';
+                ctx.fillText(subMsg, size / 2, size / 2 + 45);
+                ctx.shadowBlur = 0;
+            }
+            updateCapturedDisplay();
+        }
+
+        function hexToRgba(hex, opacity) {
+            let r = parseInt(hex.slice(1,3), 16), g = parseInt(hex.slice(3,5), 16), b = parseInt(hex.slice(5,7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        }
+
+        function updateCapturedDisplay() {
+            const whiteCaptured = game.captured.white || [];
+            const blackCaptured = game.captured.black || [];
+            let aiHtml = '', aiScore = 0;
+            blackCaptured.forEach(p => { aiHtml += `<span>${getUnicode(p)}</span>`; aiScore += PIECE_VALUES[p.type] || 0; });
+            aiCapturedPieces.innerHTML = aiHtml;
+            let playerHtml = '', playerScore = 0;
+            whiteCaptured.forEach(p => { playerHtml += `<span>${getUnicode(p)}</span>`; playerScore += PIECE_VALUES[p.type] || 0; });
+            playerCapturedPieces.innerHTML = playerHtml;
+            const diff = playerScore - aiScore;
+            if (diff > 0) { aiCapturedScore.textContent = ''; playerCapturedScore.textContent = `+${diff}`; playerCapturedScore.className = 'score positive'; }
+            else if (diff < 0) { aiCapturedScore.textContent = `${diff}`; aiCapturedScore.className = 'score positive'; playerCapturedScore.textContent = ''; }
+            else { aiCapturedScore.textContent = ''; playerCapturedScore.textContent = ''; }
+        }
+
+        // ---------- 计时器 ----------
+        let clockInterval = null;
+        let turnStartTimestamp = 0;
+        let blinkToggle = true;
+
+        function stopClock() { if (clockInterval) { clearInterval(clockInterval); clockInterval = null; } }
+
+        function startClock() {
+            stopClock();
+            if (game.gameOver) return;
+            turnStartTimestamp = Date.now();
+            clockInterval = setInterval(() => {
+                updateClockDisplay();
+                if (game.whiteTime <= 0 || game.blackTime <= 0) {
+                    setGameOverByTime();
+                    render();
+                    updateClockDisplay();
+                }
+            }, 50);
+        }
+
+        function updateClockDisplay() {
+            if (turnStartTimestamp === 0) {
+                playerTimeDisplay.textContent = formatTime(game.whiteTime, game.totalWhiteTime);
+                aiTimeDisplay.textContent = formatTime(game.blackTime, game.totalBlackTime);
+                return;
+            }
+
+            const elapsed = Date.now() - turnStartTimestamp;
+            let pTime = game.whiteTime;
+            let aTime = game.blackTime;
+            if (game.turn === COLORS.WHITE) {
+                pTime = Math.max(0, game.whiteTime - elapsed);
+            } else {
+                aTime = Math.max(0, game.blackTime - elapsed);
+            }
+            playerTimeDisplay.textContent = formatTime(pTime, game.totalWhiteTime);
+            aiTimeDisplay.textContent = formatTime(aTime, game.totalBlackTime);
+
+            const isPLow = pTime < 10000 && pTime > 0;
+            const isALow = aTime < 10000 && aTime > 0;
+            playerTimeDisplay.classList.toggle('low-time', isPLow);
+            aiTimeDisplay.classList.toggle('low-time', isALow);
+            if (isPLow) playerTimeDisplay.classList.toggle('blink', !blinkToggle);
+            else playerTimeDisplay.classList.remove('blink');
+            if (isALow) aiTimeDisplay.classList.toggle('blink', !blinkToggle);
+            else aiTimeDisplay.classList.remove('blink');
+
+            const updateProgress = (time, element, total) => {
+                if (total === 'inf' || total === 0) { element.style.display = 'none'; return; }
+                if (time > 10000) { element.style.display = 'none'; }
+                else { element.style.display = 'block'; const progress = Math.max(0, time / 10000); element.style.width = (progress * 100) + '%'; const g = Math.round(255 * progress); const b = Math.round(255 * progress); element.style.background = `rgb(255, ${g}, ${b})`; }
+            };
+            updateProgress(pTime, playerProgress, game.totalWhiteTime);
+            updateProgress(aTime, aiProgress, game.totalBlackTime);
+
+            if (pTime <= 0) { game.whiteTime = 0; setGameOverByTime(); }
+            else if (aTime <= 0) { game.blackTime = 0; setGameOverByTime(); }
+        }
+
+        function setGameOverByTime() {
+            if (game.gameOver) return;
+            stopClock();
+            game.gameOver = true;
+            if (game.whiteTime <= 0) { game.winner = 'ai'; game.endReason = '玩家时间耗尽'; }
+            else if (game.blackTime <= 0) { game.winner = 'player'; game.endReason = 'AI时间耗尽'; }
+        }
+
+        function formatTime(ms, totalMs) {
+            if (totalMs === Infinity || totalMs === 0 || totalMs === 'inf') return '∞';
+            const seconds = Math.floor(ms / 1000);
+            if (ms < 10000) {
+                const centiseconds = Math.floor((ms % 1000) / 10);
+                return `${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
+            } else {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }
+        }
+
+        setInterval(() => { blinkToggle = !blinkToggle; if (!game.gameOver) updateClockDisplay(); }, 500);
+        setInterval(() => {
+            const wrapper = boardWrapper;
+            wrapper.style.boxShadow = 'none';
+            if (game.gameOver) {
+                if (game.winner === 'player') wrapper.style.boxShadow = `inset 0 0 40px 20px ${hexToRgba(settings.glowWin, 0.8)}, 0 0 20px ${hexToRgba(settings.glowWin, 0.3)}`;
+                else if (game.winner === 'ai') wrapper.style.boxShadow = `inset 0 0 40px 20px ${hexToRgba(settings.glowLose, 0.8)}, 0 0 20px ${hexToRgba(settings.glowLose, 0.3)}`;
+            } else if (game.state && game.turn === game.playerColor && isInCheck(game.state, game.playerColor)) {
+                wrapper.style.boxShadow = `inset 0 0 40px 20px ${hexToRgba(settings.glowLose, 0.8)}, 0 0 20px ${hexToRgba(settings.glowLose, 0.3)}`;
+            }
+        }, 300);
+
+        // ---------- 走棋执行 ----------
+        function executeMoveWithAnimation(move, callback) {
+            const state = game.state;
+            const board = state.board;
+            const piece = board[move.fromRow][move.fromCol];
+            const captured = board[move.toRow][move.toCol];
+
+            if (game.turn === game.aiColor) {
+                const isCapture = captured && captured.color !== game.aiColor;
+                const simState = makeMoveState(state, move);
+                const isCheck = simState && isInCheck(simState, game.playerColor);
+                const chatText = getAIChatText(state.board, move, isCapture, isCheck);
+                showChatBubble(chatText);
+            }
+
+            if (move.castle || move.ep || (piece && piece.type === PIECES.PAWN && (move.toRow === 0 || move.toRow === 7))) {
+                if (game.turn === game.playerColor && piece && piece.type === PIECES.PAWN && (move.toRow === 0 || move.toRow === 7)) {
+                    game.pendingMove = move;
+                    game.pendingCallback = callback;
+                    showPromotionDialog(piece.color);
+                    return;
+                }
+                doExecuteMove(move);
+                if (callback) callback();
+                return;
+            }
+
+            const size = canvas.width;
+            const cellSize = size / 8;
+            const scaleX = overlay.offsetWidth / size;
+            const scaleY = overlay.offsetHeight / size;
+            const startX = move.fromCol * cellSize * scaleX;
+            const startY = move.fromRow * cellSize * scaleY;
+            const dx = (move.toCol - move.fromCol) * cellSize * scaleX;
+            const dy = (move.toRow - move.fromRow) * cellSize * scaleY;
+            const fontSize = cellSize * 0.78;
+
+            const pieceEl = document.createElement('div');
+            pieceEl.className = 'anim-piece';
+            pieceEl.style.width = (cellSize * scaleX) + 'px';
+            pieceEl.style.height = (cellSize * scaleY) + 'px';
+            pieceEl.style.display = 'flex';
+            pieceEl.style.alignItems = 'center';
+            pieceEl.style.justifyContent = 'center';
+            pieceEl.style.fontSize = (fontSize * scaleX) + 'px';
+            pieceEl.style.left = startX + 'px';
+            pieceEl.style.top = startY + 'px';
+            pieceEl.textContent = getUnicode(piece);
+            pieceEl.style.color = piece.color === COLORS.WHITE ? settings.whitePiece : settings.blackPiece;
+            overlay.appendChild(pieceEl);
+
+            let capturedEl = null;
+            if (captured) {
+                capturedEl = document.createElement('div');
+                capturedEl.className = 'anim-piece captured';
+                capturedEl.style.width = (cellSize * scaleX) + 'px';
+                capturedEl.style.height = (cellSize * scaleY) + 'px';
+                capturedEl.style.display = 'flex';
+                capturedEl.style.alignItems = 'center';
+                capturedEl.style.justifyContent = 'center';
+                capturedEl.style.fontSize = (fontSize * scaleX) + 'px';
+                capturedEl.style.left = (move.toCol * cellSize * scaleX) + 'px';
+                capturedEl.style.top = (move.toRow * cellSize * scaleY) + 'px';
+                capturedEl.textContent = getUnicode(captured);
+                capturedEl.style.color = captured.color === COLORS.WHITE ? settings.whitePiece : settings.blackPiece;
+                capturedEl.style.opacity = '1';
+                overlay.appendChild(capturedEl);
+            }
+            void pieceEl.offsetHeight;
+            if (capturedEl) void capturedEl.offsetHeight;
+            pieceEl.style.transform = `translate(${dx}px, ${dy}px)`;
+            if (capturedEl) capturedEl.style.opacity = '0';
+
+            setTimeout(() => {
+                if (pieceEl.parentNode) pieceEl.remove();
+                if (capturedEl && capturedEl.parentNode) capturedEl.remove();
+                doExecuteMove(move);
+                if (callback) callback();
+            }, 250);
+        }
+
+        function showPromotionDialog(color) {
+            const overlay = document.getElementById('promotion-overlay');
+            overlay.classList.add('active');
+            const options = overlay.querySelectorAll('.promo-opt');
+            options.forEach(el => {
+                const type = el.dataset.type;
+                el.textContent = PIECE_UNICODE[color][type];
+                el.onclick = () => {
+                    overlay.classList.remove('active');
+                    const move = game.pendingMove;
+                    const cb = game.pendingCallback;
+                    game.pendingMove = null;
+                    game.pendingCallback = null;
+                    move.promotion = type;
+                    doExecuteMove(move);
+                    if (cb) cb();
+                };
+            });
+        }
+
+        function doExecuteMove(move) {
+            stopClock();
+
+            const elapsed = Date.now() - turnStartTimestamp;
+            let deduct;
+            if (game.isPremoveExecution) {
+                deduct = Math.max(200, elapsed);
+            } else {
+                deduct = Math.max(500, elapsed);
+            }
+
+            if (game.turn === COLORS.WHITE) game.whiteTime = Math.max(0, game.whiteTime - deduct);
+            else game.blackTime = Math.max(0, game.blackTime - deduct);
+
+            if (game.whiteTime <= 0 || game.blackTime <= 0) {
+                setGameOverByTime();
+                render();
+                updateClockDisplay();
+                return;
+            }
+
+            const state = game.state;
+            const board = state.board;
+            const color = game.turn;
+            const enemy = color === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+            const piece = board[move.fromRow][move.fromCol];
+            if (!piece) return;
+
+            const capturedPiece = board[move.toRow][move.toCol];
+            if (capturedPiece) {
+                game.captured[color].push(capturedPiece);
+            }
+
+            const newState = makeMoveState(state, move);
+            if (!newState) return;
+            game.state = newState;
+            game.moveHistory.push(move);
+            game.lastMove = { fromRow: move.fromRow, fromCol: move.fromCol, toRow: move.toRow, toCol: move.toCol };
+            game.turn = enemy;
+            game.moveCount++;
+            game.selected = null;
+            game.legalMoves = [];
+
+            const fen = getFen();
+            if (!game.repetitionCount[fen]) game.repetitionCount[fen] = 0;
+            game.repetitionCount[fen]++;
+            if (game.repetitionCount[fen] >= 3) {
+                game.gameOver = true;
+                game.winner = 'draw';
+                game.endReason = '三次重复局面';
+                render();
+                updateClockDisplay();
+                return;
+            }
+
+            if (checkGameOverByMoves()) {
+                render();
+                updateClockDisplay();
+                return;
+            }
+            render();
+
+            if (game.turn === game.playerColor && game.premove && !game.isExecutingPremove) {
+                const pm = game.premove;
+                game.premove = null;
+                const pMoves = getAllLegalMoves(game.state, game.playerColor, game.lastMove);
+                const isValid = pMoves.some(m => m.fromRow === pm.fromRow && m.fromCol === pm.fromCol && m.toRow === pm.toRow && m.toCol === pm.toCol);
+                if (isValid) {
+                    game.isExecutingPremove = true;
+                    game.isPremoveExecution = true;
+                    doExecuteMove(pm);
+                    game.isPremoveExecution = false;
+                    game.isExecutingPremove = false;
+                    return;
+                }
+            }
+
+            startClock();
+            updateClockDisplay();
+
+            if (game.turn === game.aiColor && !game.gameOver && !game.isAIThinking) {
+                game.isAIThinking = true;
+                setTimeout(() => {
+                    try {
+                        let bookMoveStr = null;
+                        if (game.moveCount < 16) { bookMoveStr = getBookMove(game.moveHistory); }
+
+                        if (bookMoveStr) {
+                            const uciObj = uciToColRow(bookMoveStr);
+                            if (uciObj) {
+                                const moves = getAllLegalMoves(game.state, game.aiColor, game.lastMove);
+                                const foundMove = moves.find(m => m.fromCol === uciObj.fromCol && m.fromRow === uciObj.fromRow && m.toCol === uciObj.toCol && m.toRow === uciObj.toRow);
+                                if (foundMove) {
+                                    game.isAIThinking = false;
+                                    game.animating = true;
+                                    executeMoveWithAnimation(foundMove, () => { game.animating = false; });
+                                    return;
+                                }
+                            }
+                        }
+
+                        const move = getAIMove(game.state, game.aiColor, game.lastMove, game.aiDifficulty);
+                        game.isAIThinking = false;
+
+                        if (game.gameOver) return;
+                        if (!move) {
+                            if (checkGameOverByMoves()) { render(); updateClockDisplay(); }
+                            return;
+                        }
+
+                        const targetMinTime = 1000;
+                        const delayMs = Math.max(0, targetMinTime - 0);
+
+                        setTimeout(() => {
+                            if (game.gameOver) return;
+                            game.animating = true;
+                            executeMoveWithAnimation(move, () => { game.animating = false; });
+                        }, delayMs);
+                    } catch (e) {
+                        console.error("AI计算异常", e);
+                        game.isAIThinking = false;
+                        game.animating = false;
+                    }
+                }, 0);
+            }
+        }
+
+        function checkGameOverByMoves() {
+            const moves = getAllLegalMoves(game.state, game.turn, game.lastMove);
+            if (moves.length === 0) {
+                game.gameOver = true;
+                if (isInCheck(game.state, game.turn)) {
+                    if (game.turn === COLORS.WHITE) { game.winner = 'ai'; game.endReason = '玩家被将死'; }
+                    else { game.winner = 'player'; game.endReason = 'AI被将死'; }
+                } else { game.winner = 'draw'; game.endReason = '逼和'; }
+                return true;
+            }
+            return false;
+        }
+
+        function getFen() {
+            let fen = '';
+            const charMap = { 'king':'k', 'queen':'q', 'rook':'r', 'bishop':'b', 'knight':'n', 'pawn':'p' };
+            const board = game.state.board;
+            for (let r = 0; r < 8; r++) {
+                let empty = 0;
+                for (let c = 0; c < 8; c++) {
+                    const p = board[r][c];
+                    if (!p) { empty++; }
+                    else {
+                        if (empty > 0) { fen += empty; empty = 0; }
+                        let ch = charMap[p.type];
+                        fen += p.color === COLORS.WHITE ? ch.toUpperCase() : ch;
+                    }
+                }
+                if (empty > 0) fen += empty;
+                if (r < 7) fen += '/';
+            }
+            fen += ' ' + (game.turn === COLORS.WHITE ? 'w' : 'b');
+            let castling = '';
+            if (!game.state.kingMoved.black) {
+                if (!game.state.rookMoved.blackK) castling += 'k';
+                if (!game.state.rookMoved.blackQ) castling += 'q';
+            }
+            if (!game.state.kingMoved.white) {
+                if (!game.state.rookMoved.whiteK) castling += 'K';
+                if (!game.state.rookMoved.whiteQ) castling += 'Q';
+            }
+            fen += ' ' + (castling || '-');
+            fen += ' -';
+            return fen;
+        }
+
+        function handleCanvasClick(e) {
+            if (game.isAIThinking || game.gameOver || game.animating) return;
+
+            if (e.button === 2) {
+                game.premove = null;
+                game.selected = null;
+                game.legalMoves = [];
+                render();
+                return;
+            }
+
+            if (game.turn === game.playerColor) {
+                if (game.premove) game.premove = null;
+            }
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            const col = Math.floor(x / (canvas.width / 8));
+            const row = Math.floor(y / (canvas.height / 8));
+            if (!inBounds(row, col)) return;
+            const board = game.state.board;
+            const piece = board[row][col];
+
+            if (game.turn === game.aiColor) {
+                if (game.selected) {
+                    const targetMove = game.legalMoves.find(m => m.toRow === row && m.toCol === col);
+                    if (targetMove) {
+                        game.premove = targetMove;
+                        game.selected = null;
+                        game.legalMoves = [];
+                        render();
+                        return;
+                    }
+                    if (piece && piece.color === game.playerColor) {
+                        game.selected = { row, col };
+                        game.legalMoves = generateLegalMoves(game.state, row, col, game.lastMove);
+                        render();
+                        return;
+                    }
+                    game.selected = null;
+                    game.legalMoves = [];
+                    render();
+                    return;
+                }
+                if (piece && piece.color === game.playerColor) {
+                    const moves = generateLegalMoves(game.state, row, col, game.lastMove);
+                    if (moves.length > 0) { game.selected = { row, col }; game.legalMoves = moves; render(); }
+                }
+                return;
+            }
+
+            if (game.turn !== game.playerColor) return;
+            if (game.selected) {
+                const targetMove = game.legalMoves.find(m => m.toRow === row && m.toCol === col);
+                if (targetMove) {
+                    hideChatBubble();
+                    game.animating = true;
+                    stopClock();
+                    executeMoveWithAnimation(targetMove, () => { game.animating = false; });
+                    return;
+                }
+                if (piece && piece.color === game.turn) {
+                    game.selected = { row, col };
+                    game.legalMoves = generateLegalMoves(game.state, row, col, game.lastMove);
+                    render();
+                    return;
+                }
+                game.selected = null;
+                game.legalMoves = [];
+                render();
+                return;
+            }
+            if (piece && piece.color === game.turn) {
+                const moves = generateLegalMoves(game.state, row, col, game.lastMove);
+                if (moves.length > 0) { game.selected = { row, col }; game.legalMoves = moves; render(); }
+            }
+        }
+
+        function getAIChatText(board, move, isCapture, isCheck) {
+            const openingQuotes = ["开局还是要稳扎稳打。", "准备迎接战斗！", "让我想想布局...", "嘿嘿，这局有得下了。"];
+            const checkQuotes = ["将军！想好怎么解了吗？", "攻守转换，小心了！", "尝尝我的攻势吧！"];
+            const captureQuotes = ["嘿嘿，你的子归我了！", "这一步收获不错。", "吃！", "赚了赚了。"];
+            const endgameQuotes = ["进入残局了，别放松！", "残局是我的舞台。", "王也要上前线了。"];
+            const generalQuotes = ["让我认真想想...", "有意思，你下得挺果断。", "陷阱设好了，来踩吧！", "局势焦灼啊。", "这步棋有点意思...", "看你能不能识破我的计划。"];
+
+            if (isCapture) return captureQuotes[Math.floor(Math.random() * captureQuotes.length)];
+            if (isCheck) return checkQuotes[Math.floor(Math.random() * checkQuotes.length)];
+            let pieceCount = 0;
+            if (board) { for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) if (board[r][c]) pieceCount++; }
+            if (pieceCount <= 12) return endgameQuotes[Math.floor(Math.random() * endgameQuotes.length)];
+            if (game.moveCount < 8) return openingQuotes[Math.floor(Math.random() * openingQuotes.length)];
+            return generalQuotes[Math.floor(Math.random() * generalQuotes.length)];
+        }
+
+        function showChatBubble(text) {
+            try { aiChatText.textContent = text; aiChatBubble.classList.add('show'); } catch(e) { console.warn("显示气泡失败:", e); }
+        }
+        function hideChatBubble() { try { aiChatBubble.classList.remove('show'); } catch(e) {} }
+
+        function initGame(timeSetting, difficulty, customBoardArray, turn) {
+            let state;
+            if (customBoardArray) {
+                const board = customBoardArray.map(row => row.map(cell => cell ? { ...cell } : null));
+                const km = { white: true, black: true };
+                const rm = { whiteK: true, whiteQ: true, blackK: true, blackQ: true };
+                if (board[7][4] && board[7][4].type === PIECES.KING && board[7][4].color === COLORS.WHITE) {
+                    km.white = false;
+                    if (board[7][7] && board[7][7].type === PIECES.ROOK && board[7][7].color === COLORS.WHITE) rm.whiteK = false;
+                    if (board[7][0] && board[7][0].type === PIECES.ROOK && board[7][0].color === COLORS.WHITE) rm.whiteQ = false;
+                }
+                if (board[0][4] && board[0][4].type === PIECES.KING && board[0][4].color === COLORS.BLACK) {
+                    km.black = false;
+                    if (board[0][7] && board[0][7].type === PIECES.ROOK && board[0][7].color === COLORS.BLACK) rm.blackK = false;
+                    if (board[0][0] && board[0][0].type === PIECES.ROOK && board[0][0].color === COLORS.BLACK) rm.blackQ = false;
+                }
+                state = { board, kingMoved: km, rookMoved: rm };
+            } else {
+                state = createInitialBoardState();
+            }
+            game.state = state;
+            game.turn = turn || COLORS.WHITE;
+            game.selected = null;
+            game.legalMoves = [];
+            game.gameOver = false;
+            game.isAIThinking = false;
+            game.moveCount = 0;
+            game.lastMove = null;
+            game.animating = false;
+            overlay.innerHTML = '';
+            game.moveHistory = [];
+            game.playerColor = COLORS.WHITE;
+            game.aiColor = COLORS.BLACK;
+            game.aiDifficulty = difficulty;
+            game.winner = null;
+            game.endReason = null;
+            game.repetitionCount = {};
+            game.premove = null;
+            game.isExecutingPremove = false;
+            game.isPremoveExecution = false;
+            game.pendingMove = null;
+            game.pendingCallback = null;
+            game.captured = { white: [], black: [] };
+            hideChatBubble();
+            if (timeSetting === 'inf') {
+                game.totalWhiteTime = game.totalBlackTime = 'inf';
+                game.whiteTime = game.blackTime = Infinity;
+            } else {
+                const ms = parseInt(timeSetting) * 1000;
+                game.totalWhiteTime = game.totalBlackTime = ms;
+                game.whiteTime = game.blackTime = ms;
+            }
+
+            stopClock();
+            startClock();
+            updateClockDisplay();
+            render();
+        }
+
+        function initCustomBoard() {
+            const b = [];
+            for (let r = 0; r < 8; r++) { b[r] = []; for (let c = 0; c < 8; c++) b[r][c] = null; }
+            customBoard = b;
+            selectedPickerPiece = null;
+            customStartColor = COLORS.WHITE;
+            renderCustomBoard();
+            document.querySelectorAll('.picker-opt').forEach(el => el.classList.remove('active'));
+            document.querySelector('#custom-board-overlay .custom-opt[data-start="white"]')?.classList.add('active');
+        }
+
+        function renderCustomBoard() {
+            if (!customBoard) return;
+            const cCanvas = document.getElementById('customCanvas');
+            if (!cCanvas) return;
+            const cCtx = cCanvas.getContext('2d');
+            if (!cCtx) return;
+            const size = cCanvas.width; const cellSize = size / 8;
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const isLight = (r + c) % 2 === 0;
+                cCtx.fillStyle = isLight ? settings.lightSquare : settings.darkSquare;
+                cCtx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+            }
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = customBoard[r][c];
+                if (!p) continue;
+                const unicode = PIECE_UNICODE[p.color][p.type];
+                cCtx.font = `${cellSize * 0.78}px 'Segoe UI', 'Arial Unicode MS', 'Noto Sans', sans-serif`;
+                cCtx.textAlign = 'center'; cCtx.textBaseline = 'middle';
+                cCtx.shadowColor = 'rgba(0,0,0,0.3)'; cCtx.shadowBlur = 8;
+                cCtx.fillStyle = p.color === COLORS.WHITE ? settings.whitePiece : settings.blackPiece;
+                cCtx.fillText(unicode, c * cellSize + cellSize / 2, r * cellSize + cellSize / 2 + 2);
+                cCtx.shadowBlur = 0;
+                cCtx.strokeStyle = p.color === COLORS.WHITE ? '#b0a090' : '#404040';
+                cCtx.lineWidth = 0.5;
+                cCtx.strokeText(unicode, c * cellSize + cellSize / 2, r * cellSize + cellSize / 2 + 2);
+            }
+        }
+
+        function handleCustomCanvasClick(e) {
+            const cCanvas = document.getElementById('customCanvas');
+            const rect = cCanvas.getBoundingClientRect();
+            const scaleX = cCanvas.width / rect.width; const scaleY = cCanvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX; const y = (e.clientY - rect.top) * scaleY;
+            const col = Math.floor(x / (cCanvas.width / 8)); const row = Math.floor(y / (cCanvas.height / 8));
+            if (!inBounds(row, col)) return;
+            if (selectedPickerPiece) {
+                customBoard[row][col] = { color: selectedPickerPiece.color, type: selectedPickerPiece.type };
+            } else {
+                customBoard[row][col] = null;
+            }
+            renderCustomBoard();
+        }
+
+        function startCustomGame() {
+            const timeVal = document.getElementById('custom-time-select').value;
+            const charVal = parseInt(document.getElementById('custom-char-select').value);
+            const startEl = document.querySelector('#custom-board-overlay .custom-opt.active');
+            const startColor = startEl ? startEl.dataset.start : 'white';
+            const turn = startColor === 'black' ? COLORS.BLACK : COLORS.WHITE;
+
+            closeOverlay('custom-board-overlay', () => {
+                document.getElementById('menu-page').classList.remove('active');
+                document.getElementById('game-page').classList.add('active');
+                const boardCopy = customBoard.map(row => row.map(cell => cell ? { ...cell } : null));
+                initGame(timeVal, charVal, boardCopy, turn);
+            });
+        }
+
+        function initCharacterSelection() {
+            selectedCharNameSpan.textContent = selectedCharacter.name;
+        }
+
+        function renderCharacterList() {
+            const list = document.getElementById('character-list');
+            list.innerHTML = '';
+            CHARACTERS.forEach(char => {
+                const el = document.createElement('div');
+                el.className = 'opt';
+                el.textContent = char.name;
+                if (char.id === selectedCharacter.id) el.classList.add('selected');
+                el.onclick = () => {
+                    selectedCharacter = char;
+                    document.getElementById('char-home-title').textContent = char.name;
+                    document.getElementById('char-home-desc').textContent = char.desc;
+                    list.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+                    el.classList.add('selected');
+                };
+                list.appendChild(el);
+            });
+        }
+
+        // ======================== 事件绑定 ========================
+        document.getElementById('btn-play').addEventListener('click', () => {
+            openOverlay('setup-overlay');
+        });
+        document.getElementById('btn-custom-game').addEventListener('click', () => {
+            openOverlay('custom-board-overlay', () => {
+                initCustomBoard();
+            });
+        });
+        document.getElementById('btn-settings-menu').addEventListener('click', () => {
+            openOverlay('settings-overlay');
+        });
+        document.getElementById('btn-back').addEventListener('click', () => {
+            stopClock();
+            document.getElementById('game-page').classList.remove('active');
+            document.getElementById('menu-page').classList.add('active');
+        });
+        document.getElementById('btn-apply-settings').addEventListener('click', () => {
+            updateSettingsFromUI();
+            closeOverlay('settings-overlay');
+        });
+
+        document.getElementById('customCanvas').addEventListener('click', handleCustomCanvasClick);
+        document.getElementById('btn-clear-board').addEventListener('click', initCustomBoard);
+        document.getElementById('btn-start-custom-game').addEventListener('click', startCustomGame);
+
+        document.querySelectorAll('#piece-picker .picker-opt').forEach(el => {
+            el.addEventListener('click', function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('.picker-opt').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                const pieceStr = this.dataset.piece;
+                if (pieceStr === 'none') {
+                    selectedPickerPiece = null;
+                } else {
+                    const color = pieceStr.startsWith('w') ? COLORS.WHITE : COLORS.BLACK;
+                    const typeMap = { 'K': PIECES.KING, 'Q': PIECES.QUEEN, 'R': PIECES.ROOK, 'B': PIECES.BISHOP, 'N': PIECES.KNIGHT, 'P': PIECES.PAWN };
+                    selectedPickerPiece = { color: color, type: typeMap[pieceStr[1]] };
+                }
+                renderCustomBoard();
+            });
+        });
+
+        document.querySelectorAll('#custom-board-overlay .custom-opt').forEach(el => {
+            el.addEventListener('click', function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('.custom-opt').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.getElementById('btn-choose-character').addEventListener('click', () => {
+            openOverlay('character-overlay');
+            renderCharacterList();
+            document.getElementById('char-home-title').textContent = selectedCharacter.name;
+            document.getElementById('char-home-desc').textContent = selectedCharacter.desc;
+        });
+        document.getElementById('btn-confirm-character').addEventListener('click', () => {
+            closeOverlay('character-overlay', () => {
+                selectedCharNameSpan.textContent = selectedCharacter.name;
+                game.aiDifficulty = selectedCharacter.id;
+            });
+        });
+
+        bindTextInput('c-light', 't-light');
+        bindTextInput('c-dark', 't-dark');
+        bindTextInput('c-white', 't-white');
+        bindTextInput('c-black', 't-black');
+        bindTextInput('c-glow-lose', 't-glow-lose');
+        bindTextInput('c-glow-win', 't-glow-win');
+        bindTextInput('c-hl-move', 't-hl-move');
+        bindTextInput('c-hl-premove', 't-hl-premove');
+
+        document.querySelectorAll('#theme-options .opt').forEach(el => {
+            el.addEventListener('click', function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                setTheme(this.dataset.theme);
+            });
+        });
+        document.querySelectorAll('#time-options .opt').forEach(el => {
+            el.addEventListener('click', function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+        initCharacterSelection();
+
+        document.getElementById('btn-start-game').addEventListener('click', () => {
+            const timeEl = document.querySelector('#time-options .opt.selected');
+            const timeVal = timeEl ? timeEl.dataset.val : '600';
+            closeOverlay('setup-overlay', () => {
+                document.getElementById('menu-page').classList.remove('active');
+                document.getElementById('game-page').classList.add('active');
+                initGame(timeVal, selectedCharacter.id, null, COLORS.WHITE);
+            });
+        });
+
+        canvas.addEventListener('click', handleCanvasClick);
+        canvas.addEventListener('contextmenu', (e) => { e.preventDefault(); handleCanvasClick({ button: 2, clientX: e.clientX, clientY: e.clientY }); });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); const touch = e.touches[0]; handleCanvasClick({ clientX: touch.clientX, clientY: touch.clientY }); }, { passive: false });
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'r' || e.key === 'R') && document.getElementById('game-page').classList.contains('active')) {
+                stopClock();
+                initGame(game.totalWhiteTime === 'inf' ? 'inf' : game.totalWhiteTime/1000, game.aiDifficulty, null, game.turn);
+            }
+        });
+
+        console.log("✅ 国际象棋引擎启动成功！开局库已大幅扩充。");
+    </script>
+</body>
+</html>
