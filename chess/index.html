@@ -3,13 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>页面标题</title>
+  <title>国象 - Zhixie's page</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" href="https://uzjhf-836.github.io/sources/w11.png">
   <link rel="stylesheet" href="/css/style.css">
   <style>
+    .version-grid {
+      display: flex;
+      gap: 3rem;
+      justify-content: space-between;
+    }
+    .version-col {
+      flex: 1;
+    }
+    .main-content {
+      text-align: center;
+    }
     .main-content h1 {
       color: #ece4f5;
       transition: color 0.2s ease;
@@ -41,29 +52,35 @@
     <!-- ===== 主内容 ===== -->
     <div class="main-content">
 
-      <h1>Old version:</h1>
-      <a href=./old/v1.0.0.html style="font-size: 16px; display: block;">v1.0.0</a>
-      <a href=./old/v1.1.0.html style="font-size: 16px; display: block;">v1.1.0</a>
-      <a href=./old/v1.2.0.html style="font-size: 16px; display: block;">v1.2.0</a>
-      <a href=./old/v1.3.0.html style="font-size: 16px; display: block;">v1.3.0</a>
-      <a href=./old/v1.4.0.html style="font-size: 16px; display: block;">v1.4.0</a>
-      <a href=./old/v1.5.0.html style="font-size: 16px; display: block;">v1.5.0</a>
-      <a href=./old/v1.6.0.html style="font-size: 16px; display: block;">v1.6.0</a>
-      <a href=./old/v1.7.0.html style="font-size: 16px; display: block;">v1.7.0</a>
-      <a href=./old/v1.8.0.html style="font-size: 16px; display: block;">v1.8.0</a>
-      <a href=./old/v1.9.0.html style="font-size: 16px; display: block;">v1.9.0</a>
-      <a href=./old/v1.10.0.html style="font-size: 16px; display: block;">v1.10.0</a>
-      <a href=./old/v1.11.0.html style="font-size: 16px; display: block;">v1.11.0</a>
-      <a href=./old/v1.12.0.html style="font-size: 16px; display: block;">v1.12.0</a>
-      <a href=./old/v1.13.0.html style="font-size: 16px; display: block;">v1.13.0</a>
-      <h1>New version:</h1>
-      <a href=./v1.13.0只屑修改版.html style="font-size: 16px; display: block;">只屑改版v1.13.0</a>
-      <a href=./v1.14.0.html style="font-size: 16px; display: block;">v1.14.0</a>
-      <em><h5 style="color: #FFFFFF;font-style: italic;">PS:我经过WHXChess的授权了</h5></em>
+    <div class="version-grid">
+      <div class="version-col">
+        <h1>Old version:</h1>
+        <a href=./old/v1.0.0.html style="font-size: 16px; display: block;">v1.0.0</a>
+        <a href=./old/v1.1.0.html style="font-size: 16px; display: block;">v1.1.0</a>
+        <a href=./old/v1.2.0.html style="font-size: 16px; display: block;">v1.2.0</a>
+        <a href=./old/v1.3.0.html style="font-size: 16px; display: block;">v1.3.0</a>
+        <a href=./old/v1.4.0.html style="font-size: 16px; display: block;">v1.4.0</a>
+        <a href=./old/v1.5.0.html style="font-size: 16px; display: block;">v1.5.0</a>
+        <a href=./old/v1.6.0.html style="font-size: 16px; display: block;">v1.6.0</a>
+        <a href=./old/v1.7.0.html style="font-size: 16px; display: block;">v1.7.0</a>
+        <a href=./old/v1.8.0.html style="font-size: 16px; display: block;">v1.8.0</a>
+        <a href=./old/v1.9.0.html style="font-size: 16px; display: block;">v1.9.0</a>
+        <a href=./old/v1.10.0.html style="font-size: 16px; display: block;">v1.10.0</a>
+        <a href=./old/v1.11.0.html style="font-size: 16px; display: block;">v1.11.0</a>
+        <a href=./old/v1.12.0.html style="font-size: 16px; display: block;">v1.12.0</a>
+        <a href=./old/v1.13.0.html style="font-size: 16px; display: block;">v1.13.0</a>
+      </div>
+      <div class="version-col">
+        <h1>New version:</h1>
+        <a href=./v1.13.0只屑修改版.html style="font-size: 16px; display: block;">只屑改版v1.13.0</a>
+        <a href=./v1.14.0.html style="font-size: 16px; display: block;">v1.14.0</a>
+      </div>
+    </div>
     </div>
 
     <!-- ===== 页脚 ===== -->
     <div class="footer-note fade-in fade-in-6">
+      <em><h5 style="color: #FFFFFF; font-style: italic; margin-bottom: 0.3rem;">PS:我经过WHXChess的授权了</h5></em>
       &copy;2026 只屑 保留所有权利。
     </div>
   </div>
