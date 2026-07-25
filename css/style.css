@@ -40,6 +40,12 @@ body.light {
                     linear-gradient(145deg, #f5f2f7 0%, #ece8f0 100%);
 }
 
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
 /* === 暗色覆盖层 === */
 .dark-overlay {
   position: fixed;
