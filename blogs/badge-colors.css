@@ -1,0 +1,187 @@
+/* ============================================
+   Blog Badge cls Color Palette (30 colors)
+   从 css/blogs.css 拆出，供全站复用
+   <link rel="stylesheet" href="/blogs/badge-colors.css">
+   ============================================ */
+
+    /* 固定：红色 */
+    .blog-badge.pinned {
+      color: #ffb3b3;
+      border-color: rgba(255, 85, 85, 0.25);
+      background: rgba(255, 85, 85, 0.08);
+    }
+    /* 收藏：黄色（cookie 自动检测，只读） */
+    .blog-badge.fav {
+      color: #ffe9a8;
+      border-color: rgba(255, 200, 60, 0.3);
+      background: rgba(255, 200, 60, 0.1);
+    }
+    /* 新：青色 */
+    .blog-badge.new {
+      color: #b3ffd4;
+      border-color: rgba(60, 255, 150, 0.25);
+      background: rgba(60, 255, 150, 0.08);
+    }
+    /* 热：橙色 */
+    .blog-badge.hot {
+      color: #ffc9b3;
+      border-color: rgba(255, 140, 60, 0.3);
+      background: rgba(255, 140, 60, 0.1);
+    }
+    /* 紫：主题紫 */
+    .blog-badge.purple {
+      color: #d3c4ef;
+      border-color: rgba(166, 139, 201, 0.3);
+      background: rgba(166, 139, 201, 0.1);
+    }
+    /* 蓝 */
+    .blog-badge.blue {
+      color: #b3d0ff;
+      border-color: rgba(106, 162, 255, 0.3);
+      background: rgba(106, 162, 255, 0.1);
+    }
+    /* 粉 */
+    .blog-badge.pink {
+      color: #ffc2e0;
+      border-color: rgba(255, 122, 184, 0.3);
+      background: rgba(255, 122, 184, 0.1);
+    }
+    /* 青蓝 */
+    .blog-badge.teal {
+      color: #aef0e6;
+      border-color: rgba(47, 214, 192, 0.3);
+      background: rgba(47, 214, 192, 0.1);
+    }
+    /* 灰 */
+    .blog-badge.gray {
+      color: #c9c9d6;
+      border-color: rgba(154, 154, 172, 0.3);
+      background: rgba(154, 154, 172, 0.1);
+    }
+    /* 绿 */
+    .blog-badge.green {
+      color: #b0f0cd;
+      border-color: rgba(70, 217, 138, 0.3);
+      background: rgba(70, 217, 138, 0.1);
+    }
+    /* 蓝青 */
+    .blog-badge.cyan {
+      color: #b3eeff;
+      border-color: rgba(53, 214, 255, 0.3);
+      background: rgba(53, 214, 255, 0.1);
+    }
+    /* 靛蓝 */
+    .blog-badge.indigo {
+      color: #c4bcff;
+      border-color: rgba(124, 109, 255, 0.3);
+      background: rgba(124, 109, 255, 0.1);
+    }
+    /* 紫罗兰 */
+    .blog-badge.violet {
+      color: #ddbeff;
+      border-color: rgba(192, 109, 255, 0.3);
+      background: rgba(192, 109, 255, 0.1);
+    }
+    /* 品红 */
+    .blog-badge.magenta {
+      color: #f0b8ee;
+      border-color: rgba(227, 92, 224, 0.3);
+      background: rgba(227, 92, 224, 0.1);
+    }
+    /* 玫红 */
+    .blog-badge.rose {
+      color: #ffb3c7;
+      border-color: rgba(255, 92, 138, 0.3);
+      background: rgba(255, 92, 138, 0.1);
+    }
+    /* 绯红 */
+    .blog-badge.crimson {
+      color: #ffb3bd;
+      border-color: rgba(255, 77, 109, 0.3);
+      background: rgba(255, 77, 109, 0.1);
+    }
+    /* 金 */
+    .blog-badge.gold {
+      color: #ffe6a8;
+      border-color: rgba(232, 185, 60, 0.3);
+      background: rgba(232, 185, 60, 0.1);
+    }
+    /* 琥珀 */
+    .blog-badge.amber {
+      color: #ffd6a8;
+      border-color: rgba(245, 166, 60, 0.3);
+      background: rgba(245, 166, 60, 0.1);
+    }
+    /* 棕 */
+    .blog-badge.brown {
+      color: #d8b497;
+      border-color: rgba(176, 118, 74, 0.3);
+      background: rgba(176, 118, 74, 0.1);
+    }
+    /* 石板蓝 */
+    .blog-badge.slate {
+      color: #b4c2d8;
+      border-color: rgba(124, 140, 168, 0.3);
+      background: rgba(124, 140, 168, 0.1);
+    }
+    /* 青柠 */
+    .blog-badge.lime {
+      color: #e0f0a8;
+      border-color: rgba(168, 214, 60, 0.3);
+      background: rgba(168, 214, 60, 0.1);
+    }
+    /* 祖母绿 */
+    .blog-badge.emerald {
+      color: #a8f0d4;
+      border-color: rgba(47, 204, 143, 0.3);
+      background: rgba(47, 204, 143, 0.1);
+    }
+    /* 天蓝 */
+    .blog-badge.sky {
+      color: #b3d9ff;
+      border-color: rgba(77, 184, 255, 0.3);
+      background: rgba(77, 184, 255, 0.1);
+    }
+    /* 藏青 */
+    .blog-badge.navy {
+      color: #b0c4e8;
+      border-color: rgba(90, 127, 191, 0.3);
+      background: rgba(90, 127, 191, 0.1);
+    }
+    /* 梅紫 */
+    .blog-badge.plum {
+      color: #e0b3e0;
+      border-color: rgba(168, 84, 168, 0.3);
+      background: rgba(168, 84, 168, 0.1);
+    }
+    /* 珊瑚 */
+    .blog-badge.coral {
+      color: #ffc4b3;
+      border-color: rgba(255, 122, 102, 0.3);
+      background: rgba(255, 122, 102, 0.1);
+    }
+    /* 桃 */
+    .blog-badge.peach {
+      color: #ffd6b3;
+      border-color: rgba(255, 171, 102, 0.3);
+      background: rgba(255, 171, 102, 0.1);
+    }
+    /* 银 */
+    .blog-badge.silver {
+      color: #dedee8;
+      border-color: rgba(184, 184, 196, 0.3);
+      background: rgba(184, 184, 196, 0.1);
+    }
+    /* 橄榄 */
+    .blog-badge.olive {
+      color: #d8e0a8;
+      border-color: rgba(154, 168, 76, 0.3);
+      background: rgba(154, 168, 76, 0.1);
+    }
+    /* 酒红 */
+    .blog-badge.wine {
+      color: #e0b0b3;
+      border-color: rgba(184, 84, 90, 0.3);
+      background: rgba(184, 84, 90, 0.1);
+    }
+

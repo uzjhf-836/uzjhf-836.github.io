@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客 - Zhixie's Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://uzjhf-836.github.io/sources/w11.png">
+  <link rel="stylesheet" href="/css/blogs.css">
+  <link rel="stylesheet" href="/blogs/badge-colors.css">
+</head>
+<body>
+  <div class="dark-overlay fade-in fade-in-1"></div>
+  <div class="ripple-mask" id="rippleMask"></div>
+
+  <div class="container">
+    <div class="header fade-in fade-in-1">
+      <div class="site-title">Zhixie's Blogs</div>
+    </div>
+
+    <div class="page-layout">
+      <aside class="card-light sidebar fade-in fade-in-2">
+        <div class="nav-links">
+          <a href=/index.html><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
+          <a href=/project/index.html><i class="fas fa-project-diagram"></i> 项目</a>
+          <a href="#" class="active"><i class="fas fa-blog" style="margin-right: 4px;"></i> 博客</a>
+        </div>
+        <div class="header-btns">
+          <button class="settings-btn" id="settingsBtn" aria-label="设置">
+            <i class="fas fa-sliders-h"></i>
+          </button>
+          <div class="sort-wrap" id="sortWrap">
+            <div class="sort-board" id="sortBoard">
+              <div class="blur-bg"></div>
+              <span class="sort-label"><i class="fas fa-sort-amount-down"></i> 排序</span>
+              <div class="sort-ui">
+                <div class="fs-panel">
+                  <div class="fs-title">排序方式</div>
+                  <div class="fs-options" id="sortOptions"></div>
+                  <label class="fs-pin-row">
+                    <span class="fs-pin-label"><i class="fas fa-thumbtack"></i> 遵循置顶</span>
+                    <span class="fs-pin-box">
+                      <input type="checkbox" id="pinToggle">
+                      <span class="fs-pin-track"></span>
+                    </span>
+                  </label>
+                  <button class="fs-save" id="sortSave"><i class="fas fa-check" style="margin-right: 6px;"></i>保存并返回</button>
+                  <button class="fs-close" id="sortClose" aria-label="关闭"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="blog-list" id="blogList">
+        <!-- 文章卡片由 JS 根据「文章」数据自动生成 -->
+      </div>
+    </div>
+
+    <div class="footer-note fade-in fade-in-6">
+      ©2026 只屑 保留所有权利。
+    </div>
+  </div>
+
+  <!-- 下拉菜单 -->
+  <div class="dropdown-menu" id="settingsMenu">
+    <button class="dropdown-item" id="themeToggle">
+      <i class="fas fa-sun" id="themeIcon"></i>
+    </button>
+    <div class="dropdown-divider"></div>
+    <button class="dropdown-item" id="cookieSettingsBtn">
+      <i class="fas fa-cookie-bite"></i>
+    </button>
+  </div>
+
+  <!-- Cookie 弹窗 -->
+  <div class="cookie-banner" id="cookieBanner">
+    <div class="cookie-inner">
+      <div class="cookie-text">
+        <strong>Cookies:</strong><br> 我们使用 Cookies 以为你提供个性化体验或广告服务(当然我肯定不会搞广告)
+      </div>
+      <div class="cookie-buttons">
+        <button class="cookie-btn primary" data-choice="all">接受所有 Cookies</button>
+        <button class="cookie-btn" data-choice="necessary">仅接受必要 Cookies</button>
+        <button class="cookie-btn reject" data-choice="none">不接受 Cookies</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/blogs/文章.js"></script>
+  <script>
+    // ===== Cookie 工具函数 =====
+    var COOKIE_MAX_AGE = 36500;
+
+    function setCookie(name, value) {
+      var expires = new Date(Date.now() + COOKIE_MAX_AGE * 864e5).toUTCString();
+      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+    }
+
+    function getCookie(name) {
+      var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+
+    function clearAllCookies() {
+      document.cookie.split(';').forEach(function(c) {
+        var name = c.split('=')[0].trim();
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      });
+    }
+
+    // === 收藏检测（cookie 自动，100年有效，只读）===
+    // 收藏状态存 cookie：blog_fav = "#1,#3" （逗号分隔的文章编号）
+    // 不能通过样式列表控制，也无法点击切换，只能由 cookie 决定
+    var FAV_COOKIE = 'blog_fav';
+    function isFavorite(number) {
+      var favs = getCookie(FAV_COOKIE);
+      if (!favs) return false;
+      return favs.split(',').indexOf(number) !== -1;
+    }
+
+    // === 排序状态（blog 专属 URL 变量）===
+    // ?sort=new      → 最新在前（默认）
+    // ?sort=old      → 最旧在前
+    // ?sort=title    → 从A到Z（标题拼音序）
+    // ?sort=title-rev → 从Z到A（标题倒序）
+    // ?sort=number   → 按编号（#1、#2…）
+    // ?sort=fav      → 收藏优先（个人收藏排前，其余按最新）
+    // ?sort=random   → 随机（每次刷新不同）
+    // 不存 cookie，刷新/分享 URL 即保留排序
+    function getSortFromURL() {
+      var qs = location.search.replace(/^\?/, '');
+      var params = {};
+      if (qs) {
+        qs.split('&').forEach(function(p) {
+          var kv = p.split('=');
+          params[kv[0].toLowerCase()] = kv.length > 1 ? kv[1].toLowerCase() : '';
+        });
+      }
+      var v = params.sort;
+      if (v === 'old' || v === 'title' || v === 'title-rev' || v === 'number' || v === 'fav' || v === 'random') return v;
+      return 'new';
+    }
+    var sortBy = getSortFromURL();
+
+    // ?pin=0 → 不遵循置顶；缺省/其他 → 遵循置顶（默认开，不存 cookie）
+    function getPinFromURL() {
+      var qs = location.search.replace(/^\?/, '');
+      var params = {};
+      if (qs) {
+        qs.split('&').forEach(function(p) {
+          var kv = p.split('=');
+          params[kv[0].toLowerCase()] = kv.length > 1 ? kv[1].toLowerCase() : '';
+        });
+      }
+      return params.pin !== '0';
+    }
+    var pinOn = getPinFromURL();
+
+    // === 渲染文章列表 ===
+    function renderBlogs() {
+      var list = document.getElementById('blogList');
+      list.innerHTML = '';
+
+      // 先收集所有文章
+      var items = [];
+      Object.keys(文章).forEach(function(key) {
+        items.push({ key: key, a: 文章[key] });
+      });
+
+      // 排序方式
+      if (sortBy === 'random') {
+        // 随机：Fisher–Yates 洗牌，每次刷新都不同
+        for (var i = items.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = items[i]; items[i] = items[j]; items[j] = t;
+        }
+      } else {
+        items.sort(function(x, y) {
+          var dx = x.a[2], dy = y.a[2];
+          if (sortBy === 'old') return dx.localeCompare(dy);                 // 最旧在前
+          if (sortBy === 'title') return x.a[0].localeCompare(y.a[0], 'zh'); // 从A到Z
+          if (sortBy === 'title-rev') return y.a[0].localeCompare(x.a[0], 'zh'); // 从Z到A
+          if (sortBy === 'number') {                                          // 按编号
+            return parseInt(x.a[5].replace('#', ''), 10) - parseInt(y.a[5].replace('#', ''), 10);
+          }
+          if (sortBy === 'fav') {                                             // 收藏优先
+            var xf = isFavorite(x.a[5]) ? 1 : 0;
+            var yf = isFavorite(y.a[5]) ? 1 : 0;
+            if (xf !== yf) return yf - xf;
+            return dy.localeCompare(dx); // 收藏组内按最新
+          }
+          return dy.localeCompare(dx); // 最新在前（默认）
+        });
+      }
+
+      // 遵循置顶：样式含「固定」的文章始终排最前（各组内部保持上面排序结果）
+      if (pinOn) {
+        var pinnedItems = [], restItems = [];
+        items.forEach(function(it) {
+          if (it.a[3] && it.a[3].indexOf('固定') !== -1) pinnedItems.push(it);
+          else restItems.push(it);
+        });
+        items = pinnedItems.concat(restItems);
+      }
+
+      var idx = 0;
+      items.forEach(function(it) {
+        var a = it.a;
+        var title = a[0], desc = a[1], date = a[2], styles = a[3], tags = a[4], number = a[5];
+
+        // 样式徽标（可叠加）
+        var badges = '';
+        styles.forEach(function(s) {
+          if (s === '收藏') return; // 收藏不能通过样式列表控制
+          var b = STYLE_BADGES[s];
+          if (b) {
+            var inner = '<i class="' + b.icon + '"></i> ' + b.label;
+            var rgb = b.color ? hexToRgb(b.color) : null;
+            if (rgb) {
+              // 自定义颜色：文本=原色，边框/背景按透明度派生
+              badges += '<span class="blog-badge" style="color:' + b.color + ';border-color:rgba(' + rgb.join(',') + ',0.25);background:rgba(' + rgb.join(',') + ',0.08);">' + inner + '</span>';
+            } else {
+              // 未指定颜色 → 退回 cls 类配色
+              badges += '<span class="blog-badge ' + b.cls + '">' + inner + '</span>';
+            }
+          } else {
+            badges += '<span class="blog-badge">' + s + '</span>';
+          }
+        });
+
+        // 收藏徽标：cookie 自动检测（黄色，只读）
+        if (isFavorite(number)) {
+          badges += '<span class="blog-badge fav"><i class="fas fa-star"></i> 收藏</span>';
+        }
+
+        // 标签
+        var tagHtml = '';
+        tags.forEach(function(t) {
+          tagHtml += '<span class="blog-tag">' + t + '</span>';
+        });
+
+        // 阅读按钮：a[6] 0=无 1=有（缺省显示）；跳转 URL：a[7] "None" 或缺省 = 编号默认页
+        var hasReadBtn = a[6] === 0 ? 0 : 1;
+        var artLink = (typeof a[7] === 'string' && a[7] && a[7] !== 'None') ? a[7] : '/blogs/article/' + it.key + '.html';
+
+        idx++;
+        var delay = Math.min(2 + (idx % 5), 6);
+        var card = document.createElement('article');
+        card.className = 'card-light blog-card fade-in fade-in-' + delay;
+        card.setAttribute('data-card', '');
+        card.innerHTML =
+          '<div class="light"></div>' +
+          '<div class="blog-meta">' +
+            '<span class="blog-date"><i class="far fa-calendar-alt"></i> ' + date + '</span>' +
+            badges +
+            '<div class="blog-tags">' + tagHtml + '<span class="blog-number">' + number + '</span></div>' +
+          '</div>' +
+          '<h2 class="blog-title">' + title + '</h2>' +
+          '<p class="blog-desc">' + desc + '</p>' +
+          (hasReadBtn ? '<a class="blog-readmore" href="' + artLink + '"><i class="fas fa-arrow-right"></i> 点击阅读</a>' : '');
+        list.appendChild(card);
+      });
+
+      // 动态生成的卡片需要重新绑定光效
+      bindCardLights();
+    }
+
+    // ==============================================
+    // 排序：全屏遮罩选择（blog 专属 URL 变量）
+    // ?sort=new / old / title / title-rev / number / fav / random
+    // 选中某选项 → 写 URL（保留其他参数），不写 cookie
+    // ==============================================
+    var sortBoard = document.getElementById('sortBoard');
+    var sortWrap = document.getElementById('sortWrap');
+    var sortOptions = document.getElementById('sortOptions');
+    var sortClose = document.getElementById('sortClose');
+    var selectedSort = sortBy; // 遮罩内当前选中（保存前不生效）
+    var selectedPin = pinOn;   // 遮罩内「遵循置顶」勾选（保存前不生效）
+    var isSortOpen = false;    // 背景板是否已展开
+    var sortAnim = null;       // 按钮扩散动画
+
+    var SORT_OPTIONS = [
+      { key: 'new',       icon: 'fas fa-arrow-down-wide-short', label: '最新在前' },
+      { key: 'old',       icon: 'fas fa-arrow-up-short-wide',   label: '最旧在前' },
+      { key: 'title',     icon: 'fas fa-sort-alpha-down',       label: '从A到Z' },
+      { key: 'title-rev', icon: 'fas fa-sort-alpha-up',         label: '从Z到A' },
+      { key: 'number',    icon: 'fas fa-hashtag',               label: '按编号' },
+      { key: 'fav',       icon: 'fas fa-star',                  label: '收藏优先' },
+      { key: 'random',    icon: 'fas fa-shuffle',               label: '随机' }
+    ];
+
+    function buildSortOptions() {
+      sortOptions.innerHTML = '';
+      SORT_OPTIONS.forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'fs-option' + (selectedSort === opt.key ? ' active' : '');
+        btn.innerHTML = '<i class="' + opt.icon + '"></i> ' + opt.label;
+        btn.addEventListener('click', function() {
+          // 只选中，不立即应用；点「保存并返回」才生效
+          selectedSort = opt.key;
+          sortOptions.querySelectorAll('.fs-option').forEach(function(b) {
+            b.classList.remove('active');
+          });
+          btn.classList.add('active');
+        });
+        sortOptions.appendChild(btn);
+      });
+    }
+
+    var pinToggle = document.getElementById('pinToggle');
+    function buildPinToggle() {
+      selectedPin = pinOn; // 每次打开从当前生效状态开始
+      pinToggle.checked = selectedPin;
+    }
+    if (pinToggle) {
+      pinToggle.addEventListener('change', function() {
+        selectedPin = pinToggle.checked; // 只勾选，不立即应用
+      });
+    }
+
+    function writeSortURL() {
+      // 解析当前 query，保留其他参数（如主题 ?white），只更新 sort / pin
+      var params = {};
+      var qs = location.search.replace(/^\?/, '');
+      if (qs) {
+        qs.split('&').forEach(function(p) {
+          if (!p) return;
+          var kv = p.split('=');
+          params[kv[0]] = kv.length > 1 ? kv[1] : '';
+        });
+      }
+      if (selectedSort === 'new') {
+        delete params['sort']; // 默认状态，去掉变量
+      } else {
+        params['sort'] = selectedSort;
+      }
+      if (selectedPin) {
+        delete params['pin']; // 默认开启，去掉变量
+      } else {
+        params['pin'] = '0';
+      }
+      var newQs = Object.keys(params).map(function(k) {
+        return params[k] ? k + '=' + params[k] : k;
+      }).join('&');
+      location.search = newQs ? '?' + newQs : '';
+    }
+
+    function openSortMask() {
+      if (isSortOpen) return;
+      selectedSort = sortBy; // 每次打开从当前生效状态开始
+      buildSortOptions();
+      buildPinToggle();
+
+      if (sortAnim) { sortAnim.cancel(); sortAnim = null; }
+
+      var rect = sortWrap.getBoundingClientRect();
+      var vpW = window.innerWidth, vpH = window.innerHeight;
+
+      // 内联 position:fixed + 几何：锁死定位，body 的 flex 无法居中它
+      sortBoard.style.position = 'fixed';
+      sortBoard.style.top = rect.top + 'px';
+      sortBoard.style.left = rect.left + 'px';
+      sortBoard.style.width = rect.width + 'px';
+      sortBoard.style.height = rect.height + 'px';
+      sortBoard.style.borderRadius = '20px';
+      sortBoard.classList.add('fixed');
+
+      // 移到 body 顶层：脱离侧边栏卡片的裁剪/堆叠限制，图层干净
+      document.body.appendChild(sortBoard);
+      // 侧边栏原位留白，避免齿轮按钮跳动
+      sortWrap.style.minWidth = rect.width + 'px';
+      sortWrap.style.minHeight = rect.height + 'px';
+
+      void sortBoard.offsetWidth; // 强制回流，锁定起点
+      isSortOpen = true;
+      // 双重 rAF：先渲染一帧「按钮大小」的板子，再启动宽高扩散动画
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          if (!isSortOpen) return;
+          sortBoard.classList.add('open'); // blur-bg 渐显 + 「排序」渐隐 + 设置渐显
+          sortAnim = sortBoard.animate(
+            [
+              { top: rect.top + 'px', left: rect.left + 'px',
+                width: rect.width + 'px', height: rect.height + 'px',
+                borderRadius: '20px' },
+              { top: '0px', left: '0px',
+                width: vpW + 'px', height: vpH + 'px',
+                borderRadius: '0px' }
+            ],
+            { duration: 500, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+          );
+        });
+      });
+    }
+
+    function closeSortMask() {
+      if (!isSortOpen) return;
+      if (sortAnim) { sortAnim.cancel(); sortAnim = null; }
+
+      var rect = sortWrap.getBoundingClientRect(); // wrapper 仍占按钮位
+      var vpW = window.innerWidth, vpH = window.innerHeight;
+
+      sortBoard.classList.remove('open'); // blur-bg 渐隐 + 设置渐隐 + 「排序」渐显
+      isSortOpen = false;
+
+      // 对称缩回按钮
+      sortAnim = sortBoard.animate(
+        [
+          { top: '0px', left: '0px',
+            width: vpW + 'px', height: vpH + 'px',
+            borderRadius: '0px' },
+          { top: rect.top + 'px', left: rect.left + 'px',
+            width: rect.width + 'px', height: rect.height + 'px',
+            borderRadius: '20px' }
+        ],
+        { duration: 500, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+      );
+
+      sortAnim.onfinish = function() {
+        sortAnim.cancel(); // 释放 fill 效果，恢复样式表控制
+        sortAnim = null;
+        // 清空内联定位，恢复为普通按钮并放回侧边栏
+        sortBoard.style.position = '';
+        sortBoard.style.top = '';
+        sortBoard.style.left = '';
+        sortBoard.style.width = '';
+        sortBoard.style.height = '';
+        sortBoard.style.borderRadius = '';
+        sortBoard.classList.remove('fixed');
+        sortWrap.style.minWidth = '';
+        sortWrap.style.minHeight = '';
+        sortWrap.appendChild(sortBoard);
+      };
+    }
+
+    // 「保存并返回」：应用选中项（排序 + 遵循置顶）
+    function saveSort() {
+      if (selectedSort !== sortBy || selectedPin !== pinOn) {
+        writeSortURL(); // 写 URL，重新排序
+      }
+      closeSortMask();
+    }
+
+    // 背景板点击：未展开 → 展开；已展开 → 点面板外关闭
+    sortBoard.addEventListener('click', function(e) {
+      // 先挡掉面板内部的点击（选项/保存/关闭按钮），避免关闭后又被冒泡重开
+      if (e.target.closest('.fs-panel')) return;
+      if (!isSortOpen) { openSortMask(); return; }
+      closeSortMask();
+    });
+    document.getElementById('sortSave').addEventListener('click', saveSort);
+    sortClose.addEventListener('click', closeSortMask);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeSortMask();
+    });
+
+    // 页面加载后渲染
+    renderBlogs();
+
+    var banner = document.getElementById('cookieBanner');
+    var settingsBtn = document.getElementById('settingsBtn');
+    var settingsMenu = document.getElementById('settingsMenu');
+    var themeToggle = document.getElementById('themeToggle');
+    var themeIcon = document.getElementById('themeIcon');
+    var cookieSettingsBtn = document.getElementById('cookieSettingsBtn');
+    var mask = document.getElementById('rippleMask');
+    var body = document.body;
+    var isProcessing = false;
+    var activeCard = null;
+    var consent = getCookie('cookie_consent');
+    var menuOpen = false;
+
+    // ===== 下拉菜单位置计算 =====
+    function updateMenuPosition() {
+      var rect = settingsBtn.getBoundingClientRect();
+      settingsMenu.style.top = (rect.bottom + 8) + 'px';
+      settingsMenu.style.left = (rect.right - settingsMenu.offsetWidth) + 'px';
+    }
+
+    // ===== 下拉菜单开关 =====
+    settingsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      menuOpen = !menuOpen;
+      if (menuOpen) {
+        updateMenuPosition();
+        settingsMenu.classList.add('open');
+      } else {
+        settingsMenu.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('click', function() {
+      if (menuOpen) {
+        menuOpen = false;
+        settingsMenu.classList.remove('open');
+      }
+    });
+
+    window.addEventListener('resize', function() {
+      if (menuOpen) {
+        updateMenuPosition();
+      }
+    });
+
+    window.addEventListener('scroll', function() {
+      if (menuOpen) {
+        updateMenuPosition();
+      }
+    });
+
+    // ===== 应用主题 =====
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        body.classList.add('light');
+        themeIcon.className = 'fas fa-moon';
+      } else {
+        body.classList.remove('light');
+        themeIcon.className = 'fas fa-sun';
+      }
+    }
+
+    // ===== 切换主题 + 扩散动画 =====
+    function toggleTheme() {
+      if (!getCookie('cookie_consent')) return;
+      if (isProcessing) return;
+
+      var rect = settingsBtn.getBoundingClientRect();
+      var x = rect.left + rect.width / 2;
+      var y = rect.top + rect.height / 2;
+
+      var isLight = body.classList.contains('light');
+      var rippleColor = isLight ? 'dark-ripple' : 'light-ripple';
+
+      var circle = document.createElement('div');
+      circle.classList.add('ripple-circle', rippleColor);
+      var size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
+      circle.style.width = size + 'px';
+      circle.style.height = size + 'px';
+      circle.style.left = (x - size / 2) + 'px';
+      circle.style.top = (y - size / 2) + 'px';
+      mask.appendChild(circle);
+
+      setTimeout(function() {
+        var newTheme = isLight ? 'dark' : 'light';
+        applyTheme(newTheme);
+        if (getCookie('cookie_consent') === 'all') {
+          setCookie('theme', newTheme);
+        }
+      }, 150);
+
+      setTimeout(function() { circle.remove(); }, 2100);
+    }
+
+    // ===== URL 参数强制主题（不存 cookie）=====
+    // ?1 / ?w / ?white / ?light  → 亮色
+    // ?0 / ?b / ?black / ?dark   → 黑色
+    function getThemeFromURL() {
+      var qs = location.search.replace(/^\?/, '');
+      if (!qs) return null;
+      var map = {
+        '1': 'light', 'w': 'light', 'white': 'light', 'light': 'light',
+        '0': 'dark',  'b': 'dark',  'black': 'dark',  'dark': 'dark'
+      };
+      var parts = qs.split('&');
+      for (var i = 0; i < parts.length; i++) {
+        var kv = parts[i].split('=');
+        var key = kv[0].toLowerCase();
+        var val = (kv.length > 1) ? kv[1].toLowerCase() : key;
+        if (map[key]) return map[key];
+        if (map[val]) return map[val];
+      }
+      return null;
+    }
+
+    // ===== 恢复主题 =====
+    var urlTheme = getThemeFromURL();
+    // theme 仅在无 URL 参数时才读取（被 URL 覆盖则不读）
+    var savedTheme = getCookie('theme');
+
+    // consent 没被覆盖，始终读取：决定 cookie 弹窗是否隐藏
+    if (consent) {
+      banner.classList.add('hidden');
+    }
+
+    if (urlTheme) {
+      // URL 参数优先，且不写 cookie
+      applyTheme(urlTheme);
+    } else if (consent) {
+      if (savedTheme === 'light') {
+        applyTheme('light');
+      } else {
+        applyTheme('dark');
+      }
+    } else {
+      applyTheme('dark');
+    }
+
+    // ===== 主题切换点击 =====
+    themeToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!getCookie('cookie_consent')) return;
+      toggleTheme();
+      menuOpen = false;
+      settingsMenu.classList.remove('open');
+    });
+
+    // ===== Cookie 设置点击 =====
+    cookieSettingsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showCookieBanner();
+      menuOpen = false;
+      settingsMenu.classList.remove('open');
+    });
+
+    // ===== 卡片光效（函数化，供动态渲染后重新绑定）=====
+    function bindCardLights() {
+      document.querySelectorAll('[data-card]').forEach(function(card) {
+        var light = card.querySelector('.light');
+
+        card.addEventListener('mouseenter', function() {
+          document.querySelectorAll('.light').forEach(function(l) { l.classList.remove('show'); });
+          light.classList.add('show');
+          activeCard = card;
+        });
+
+        card.addEventListener('mousemove', function(e) {
+          if (activeCard !== card) return;
+          var rect = card.getBoundingClientRect();
+          var x = ((e.clientX - rect.left) / rect.width) * 100;
+          var y = ((e.clientY - rect.top) / rect.height) * 100;
+          light.style.setProperty('--x', x + '%');
+          light.style.setProperty('--y', y + '%');
+        });
+
+        card.addEventListener('mouseleave', function() {
+          if (activeCard === card) {
+            light.classList.remove('show');
+            activeCard = null;
+          }
+        });
+      });
+    }
+
+    // ===== Cookie 弹窗 =====
+    function showCookieBanner() {
+      banner.classList.remove('hidden', 'fade-out');
+      banner.style.display = '';
+      document.querySelectorAll('.cookie-btn').forEach(function(b) {
+        b.disabled = false;
+      });
+      isProcessing = false;
+    }
+
+    document.querySelectorAll('.cookie-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (isProcessing) return;
+
+        var choice = this.dataset.choice;
+        var allBtns = document.querySelectorAll('.cookie-btn');
+
+        allBtns.forEach(function(b) { b.disabled = true; });
+        isProcessing = true;
+
+        banner.classList.add('fade-out');
+
+        setTimeout(function() {
+          clearAllCookies();
+
+          if (choice === 'all') {
+            setCookie('cookie_consent', 'all');
+            var isLight = body.classList.contains('light');
+            setCookie('theme', isLight ? 'light' : 'dark');
+          } else if (choice === 'necessary') {
+            setCookie('cookie_consent', 'necessary');
+            applyTheme('dark');
+          } else {
+            setCookie('cookie_consent', 'none');
+            applyTheme('dark');
+          }
+
+          banner.classList.add('hidden');
+          isProcessing = false;
+          allBtns.forEach(function(b) { b.disabled = false; });
+        }, 700);
+      });
+    });
+  </script>
+</body>
+</html>

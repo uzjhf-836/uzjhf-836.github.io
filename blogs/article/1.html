@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章标题 - Zhixie's Blogs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://uzjhf-836.github.io/sources/w11.png">
+  <link rel="stylesheet" href="/css/blogs.css">
+  <link rel="stylesheet" href="/blogs/badge-colors.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+  <div class="dark-overlay fade-in fade-in-1"></div>
+  <div class="ripple-mask" id="rippleMask"></div>
+
+  <div class="container">
+    <div class="page-layout">
+      <!-- 左侧固定列：两张卡片 -->
+      <div class="left-col">
+      <aside class="card-light sidebar fade-in fade-in-2">
+        <div class="site-title sidebar-title">Zhixie's Blogs</div>
+        <div class="nav-links">
+          <a href=/index.html><i class="fas fa-home" style="margin-right: 4px;"></i> 首页</a>
+          <a href=/project/index.html><i class="fas fa-project-diagram"></i> 项目</a>
+          <a href="/blogs/index.html" class="active"><i class="fas fa-blog" style="margin-right: 4px;"></i> 博客</a>
+        </div>
+        <div class="header-btns">
+          <button class="settings-btn" id="settingsBtn" aria-label="设置">
+            <i class="fas fa-sliders-h"></i>
+          </button>
+          <a class="header-btn article-back" href="/blogs/index.html"><i class="fas fa-arrow-left"></i> 返回博客</a>
+        </div>
+
+        <!-- 版权信息 -->
+        <div class="footer-note fade-in fade-in-6">
+          ©2026 只屑 保留所有权利。
+        </div>
+      </aside>
+
+      <!-- 第二张固定卡片：高度 = 视口高 - 左卡片高 - 30 -->
+      <div class="card-light side-card fade-in fade-in-3">
+        <div class="reading-stats">
+          <div class="reading-count"><i class="fas fa-file-alt"></i> 总字数: <span id="wordCount">--</span>字</div>
+          <div class="reading-time">
+            <i class="fas fa-clock"></i> 预计阅读时间: <span id="readTime">--</span>
+          </div>
+        </div>
+        <div class="reading-progress">
+          <div class="reading-progress-head">
+            <span class="reading-progress-label"><i class="fas fa-book-reader"></i> 阅读进度</span>
+            <span class="reading-pct" id="readingPct">0%</span>
+          </div>
+          <div class="reading-bar-row">
+            <div class="reading-bar">
+              <div class="reading-bar-fill" id="readingBar"></div>
+            </div>
+            <button class="reading-top" id="readingTop" title="返回顶部" aria-label="返回顶部">
+              <i class="fas fa-chevron-up"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- ===== 文章 ===== -->
+      <article class="card-light article fade-in fade-in-2">
+      <div class="light"></div>
+      <div class="article-meta">
+        <span class="blog-date" id="artDate"></span>
+        <span id="artBadges"></span>
+        <div class="blog-tags" id="artTags"></div>
+      </div>
+      <h1 class="article-title" id="artTitle"></h1>
+      <div class="article-body" id="artBody"></div>
+    </article>
+    </div>
+
+    <!-- ===== 正文 Markdown（支持混写原生 HTML，marked 渲染）===== -->
+    <script type="text/markdown" id="artBodyMd">
+## 欢迎
+
+这是我的第一篇博客，正文支持 **Markdown** 混写原生 HTML。
+
+- 支持 **加粗**、*斜体*、`行内代码`
+- 支持列表、引用、代码块
+- 支持 `<span style="color:#ff6b6b">内嵌 HTML</span>`，格式原样保留
+
+~~一句话：好好写代码，别写屎山。~~
+^^^就要写屎山！！！
+
+### 代码块
+
+```js
+function hello() {
+  console.log('Hello, Zhixie!');
+}
+```
+```python
+print("This is a Blog!")
+```
+### 原生 HTML 原样输出
+
+<p style="padding:12px 16px;border-radius:10px;background:rgba(166,139,201,0.15);color:#c9b8e0;">这段是原生 HTML 段落，样式、颜色、结构全部保留。</p>
+    </script>
+  </div>
+
+  <!-- ===== 下拉菜单 ===== -->
+  <div class="dropdown-menu" id="settingsMenu">
+    <button class="dropdown-item" id="themeToggle">
+      <i class="fas fa-sun" id="themeIcon"></i>
+    </button>
+    <div class="dropdown-divider"></div>
+    <button class="dropdown-item" id="cookieSettingsBtn">
+      <i class="fas fa-cookie-bite"></i>
+    </button>
+  </div>
+
+  <!-- ===== Cookie 弹窗 ===== -->
+  <div class="cookie-banner" id="cookieBanner">
+    <div class="cookie-inner">
+      <div class="cookie-text">
+        <strong>Cookies:</strong><br> 我们使用 Cookies 以为你提供个性化体验或广告服务(当然我肯定不会搞广告)
+      </div>
+      <div class="cookie-buttons">
+        <button class="cookie-btn primary" data-choice="all">接受所有 Cookies</button>
+        <button class="cookie-btn" data-choice="necessary">仅接受必要 Cookies</button>
+        <button class="cookie-btn reject" data-choice="none">不接受 Cookies</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 移动端返回顶部悬浮按钮（进度 >=10% 时出现）===== -->
+  <button class="reading-fab" id="readingFab" title="返回顶部" aria-label="返回顶部">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <script src="/blogs/文章.js"></script>
+  <script>
+    var COOKIE_MAX_AGE = 36500;
+
+    function setCookie(name, value) {
+      var expires = new Date(Date.now() + COOKIE_MAX_AGE * 864e5).toUTCString();
+      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+    }
+
+    function getCookie(name) {
+      var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+
+    function clearAllCookies() {
+      document.cookie.split(';').forEach(function(c) {
+        var name = c.split('=')[0].trim();
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      });
+    }
+
+    var banner = document.getElementById('cookieBanner');
+    var settingsBtn = document.getElementById('settingsBtn');
+    var settingsMenu = document.getElementById('settingsMenu');
+    var themeToggle = document.getElementById('themeToggle');
+    var themeIcon = document.getElementById('themeIcon');
+    var cookieSettingsBtn = document.getElementById('cookieSettingsBtn');
+    var mask = document.getElementById('rippleMask');
+    var body = document.body;
+    var isProcessing = false;
+    var activeCard = null;
+    var consent = getCookie('cookie_consent');
+    var menuOpen = false;
+
+    // ===== 文章属性：从 /blogs/文章.js 读取 =====
+    // 用 ?id=N 指定第 N 篇（默认本篇 /blogs/article/1.html → 第 1 篇）
+    var FAV_COOKIE = 'blog_fav';
+    function isFavorite(number) {
+      var favs = getCookie(FAV_COOKIE);
+      if (!favs) return false;
+      return favs.split(',').indexOf(number) !== -1;
+    }
+
+    // 文章编号从文件名取：/blogs/article/2.html → 2（不再用 ?id= 参数）
+    var artId = '1';
+    var nameMatch = location.pathname.match(/article\/(\d+)\.html/i);
+    if (nameMatch) artId = nameMatch[1];
+    var artData = 文章[artId];
+    if (!artData) {
+      artId = Object.keys(文章)[0];
+      artData = 文章[artId];
+    }
+
+    function renderArticleMeta() {
+      var a = artData;
+      var title = a[0], date = a[2], styles = a[3], tags = a[4], number = a[5];
+
+      // 标题开关：a[8] 0 = 保留 HTML 硬编码的 <title>，1/缺省 = 自动设「标题 - Zhixie's Blogs」
+      if (a[8] !== 0) {
+        document.title = title + ' - Zhixie\'s Blogs';
+      }
+      document.getElementById('artTitle').textContent = title;
+      document.getElementById('artDate').innerHTML = '<i class="far fa-calendar-alt"></i> ' + date;
+
+      // 样式徽标（可叠加）
+      var badges = '';
+      styles.forEach(function(s) {
+        if (s === '收藏') return; // 收藏不能通过样式列表控制
+        var b = STYLE_BADGES[s];
+        if (b) {
+          var inner = '<i class="' + b.icon + '"></i> ' + b.label;
+          var rgb = b.color ? hexToRgb(b.color) : null;
+          if (rgb) {
+            badges += '<span class="blog-badge" style="color:' + b.color + ';border-color:rgba(' + rgb.join(',') + ',0.25);background:rgba(' + rgb.join(',') + ',0.08);">' + inner + '</span>';
+          } else {
+            badges += '<span class="blog-badge ' + b.cls + '">' + inner + '</span>';
+          }
+        } else {
+          badges += '<span class="blog-badge">' + s + '</span>';
+        }
+      });
+
+      // 收藏徽标：cookie 自动检测
+      if (isFavorite(number)) {
+        badges += '<span class="blog-badge fav"><i class="fas fa-star"></i> 收藏</span>';
+      }
+      document.getElementById('artBadges').innerHTML = badges;
+
+      // 标签 + 编号
+      var tagHtml = '';
+      tags.forEach(function(t) {
+        tagHtml += '<span class="blog-tag">' + t + '</span>';
+      });
+      tagHtml += '<span class="blog-number">' + number + '</span>';
+      document.getElementById('artTags').innerHTML = tagHtml;
+    }
+
+    renderArticleMeta();
+
+    // ===== 正文：marked 渲染 Markdown，原生 HTML 原样透传 =====
+    var artMd = document.getElementById('artBodyMd');
+    var artBody = document.getElementById('artBody');
+    if (artMd) {
+      if (window.marked) {
+        artBody.innerHTML = marked.parse(artMd.textContent);
+        // 代码块：顶部语言名 + 分割线；语法高亮
+        artBody.querySelectorAll('pre').forEach(function(pre) {
+          var code = pre.querySelector('code');
+          if (!code) return;
+          if (window.hljs) hljs.highlightElement(code);
+          // 从 ```js 取语言名，非空才插语言头（无语言就不显示）
+          var m = (code.className || '').match(/language-([\w+-]+)/);
+          if (m && m[1]) {
+            var hdr = document.createElement('div');
+            hdr.className = 'code-lang';
+            hdr.textContent = m[1];
+            pre.insertBefore(hdr, code);
+          }
+        });
+      } else {
+        artBody.textContent = artMd.textContent; // marked 未加载时兜底显示原文
+      }
+    }
+
+    // ===== 总字数 + 预计阅读时间：a[10] 1=自动按字数算，0=用 a[9] 填的分钟数 =====
+    var readTimeEl = document.getElementById('readTime');
+    var wordCountEl = document.getElementById('wordCount');
+    var words = 0;
+    if (artMd) {
+      var txt = artMd.textContent;
+      var cjk = (txt.match(/[一-鿿㐀-䶿]/g) || []).length;
+      var other = txt.replace(/[一-鿿㐀-䶿]/g, ' ').match(/[a-zA-Z0-9_]+/g);
+      words = cjk + (other ? other.length : 0);
+    }
+    if (wordCountEl) wordCountEl.textContent = words;
+    if (readTimeEl) {
+      var mins;
+      if (artData[10] !== 0 && artMd) {
+        mins = Math.max(1, Math.round(words / 300));
+      } else {
+        mins = Math.max(1, parseInt(artData[9], 10) || 1);
+      }
+      readTimeEl.textContent = mins + ' 分钟';
+    }
+
+    // ===== 阅读进度：按整页滚动位置算 %（从页面顶端计起，手机上不会等到文章滚进视口才动）=====
+    var readingBar = document.getElementById('readingBar');
+    var readingPct = document.getElementById('readingPct');
+    var readingTop = document.getElementById('readingTop');
+    var barRow = document.querySelector('.reading-bar-row');
+    if (readingBar && readingPct) {
+      function updateReadingProgress() {
+        var doc = document.documentElement;
+        var total = doc.scrollHeight - window.innerHeight; // 整页可滚动距离
+        var pct = total <= 0 ? 100 : Math.round((window.scrollY / total) * 100);
+        pct = Math.min(100, Math.max(0, pct));
+        readingBar.style.width = pct + '%';
+        readingPct.textContent = pct + '%';
+        // 进度 >=10%：桌面端进度条左缩 + 右侧返回按钮；移动端右下角悬浮按钮
+        if (barRow) barRow.classList.toggle('top-visible', pct >= 10);
+        document.body.classList.toggle('fab-visible', pct >= 10);
+      }
+      updateReadingProgress();
+      window.addEventListener('scroll', updateReadingProgress);
+      window.addEventListener('resize', updateReadingProgress);
+    }
+    if (readingTop) {
+      readingTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+    var readingFab = document.getElementById('readingFab');
+    if (readingFab) {
+      readingFab.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    function updateMenuPosition() {
+      var rect = settingsBtn.getBoundingClientRect();
+      settingsMenu.style.top = (rect.bottom + 8) + 'px';
+      settingsMenu.style.left = (rect.right - settingsMenu.offsetWidth) + 'px';
+    }
+
+    settingsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      menuOpen = !menuOpen;
+      if (menuOpen) {
+        updateMenuPosition();
+        settingsMenu.classList.add('open');
+      } else {
+        settingsMenu.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('click', function() {
+      if (menuOpen) {
+        menuOpen = false;
+        settingsMenu.classList.remove('open');
+      }
+    });
+
+    window.addEventListener('resize', function() {
+      if (menuOpen) {
+        updateMenuPosition();
+      }
+    });
+
+    window.addEventListener('scroll', function() {
+      if (menuOpen) {
+        updateMenuPosition();
+      }
+    });
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        body.classList.add('light');
+        themeIcon.className = 'fas fa-moon';
+      } else {
+        body.classList.remove('light');
+        themeIcon.className = 'fas fa-sun';
+      }
+    }
+
+    function toggleTheme() {
+      if (!getCookie('cookie_consent')) return;
+      if (isProcessing) return;
+
+      var rect = settingsBtn.getBoundingClientRect();
+      var x = rect.left + rect.width / 2;
+      var y = rect.top + rect.height / 2;
+
+      var isLight = body.classList.contains('light');
+      var rippleColor = isLight ? 'dark-ripple' : 'light-ripple';
+
+      var circle = document.createElement('div');
+      circle.classList.add('ripple-circle', rippleColor);
+      var size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
+      circle.style.width = size + 'px';
+      circle.style.height = size + 'px';
+      circle.style.left = (x - size / 2) + 'px';
+      circle.style.top = (y - size / 2) + 'px';
+      mask.appendChild(circle);
+
+      setTimeout(function() {
+        var newTheme = isLight ? 'dark' : 'light';
+        applyTheme(newTheme);
+        if (getCookie('cookie_consent') === 'all') {
+          setCookie('theme', newTheme);
+        }
+      }, 150);
+
+      setTimeout(function() { circle.remove(); }, 2100);
+    }
+
+    // ===== URL 参数强制主题（不存 cookie）=====
+    // ?1 / ?w / ?white / ?light  → 亮色
+    // ?0 / ?b / ?black / ?dark   → 黑色
+    function getThemeFromURL() {
+      var qs = location.search.replace(/^\?/, '');
+      if (!qs) return null;
+      var map = {
+        '1': 'light', 'w': 'light', 'white': 'light', 'light': 'light',
+        '0': 'dark',  'b': 'dark',  'black': 'dark',  'dark': 'dark'
+      };
+      var parts = qs.split('&');
+      for (var i = 0; i < parts.length; i++) {
+        var kv = parts[i].split('=');
+        var key = kv[0].toLowerCase();
+        var val = (kv.length > 1) ? kv[1].toLowerCase() : key;
+        if (map[key]) return map[key];
+        if (map[val]) return map[val];
+      }
+      return null;
+    }
+
+    var urlTheme = getThemeFromURL();
+    var savedTheme = getCookie('theme');
+
+    if (consent) {
+      banner.classList.add('hidden');
+    }
+
+    if (urlTheme) {
+      applyTheme(urlTheme);
+    } else if (consent) {
+      if (savedTheme === 'light') {
+        applyTheme('light');
+      } else {
+        applyTheme('dark');
+      }
+    } else {
+      applyTheme('dark');
+    }
+
+    themeToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!getCookie('cookie_consent')) return;
+      toggleTheme();
+      menuOpen = false;
+      settingsMenu.classList.remove('open');
+    });
+
+    cookieSettingsBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showCookieBanner();
+      menuOpen = false;
+      settingsMenu.classList.remove('open');
+    });
+
+    document.querySelectorAll('[data-card]').forEach(function(card) {
+      var light = card.querySelector('.light');
+
+      card.addEventListener('mouseenter', function() {
+        light.classList.add('show');
+        activeCard = card;
+      });
+
+      card.addEventListener('mousemove', function(e) {
+        if (activeCard !== card) return;
+        var rect = card.getBoundingClientRect();
+        var x = ((e.clientX - rect.left) / rect.width) * 100;
+        var y = ((e.clientY - rect.top) / rect.height) * 100;
+        light.style.setProperty('--x', x + '%');
+        light.style.setProperty('--y', y + '%');
+      });
+
+      card.addEventListener('mouseleave', function() {
+        if (activeCard === card) {
+          light.classList.remove('show');
+          activeCard = null;
+        }
+      });
+    });
+
+    function showCookieBanner() {
+      banner.classList.remove('hidden', 'fade-out');
+      banner.style.display = '';
+      document.querySelectorAll('.cookie-btn').forEach(function(b) {
+        b.disabled = false;
+      });
+      isProcessing = false;
+    }
+
+    document.querySelectorAll('.cookie-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (isProcessing) return;
+
+        var choice = this.dataset.choice;
+        var allBtns = document.querySelectorAll('.cookie-btn');
+
+        allBtns.forEach(function(b) { b.disabled = true; });
+        isProcessing = true;
+
+        banner.classList.add('fade-out');
+
+        setTimeout(function() {
+          clearAllCookies();
+
+          if (choice === 'all') {
+            setCookie('cookie_consent', 'all');
+            var isLight = body.classList.contains('light');
+            setCookie('theme', isLight ? 'light' : 'dark');
+          } else if (choice === 'necessary') {
+            setCookie('cookie_consent', 'necessary');
+            applyTheme('dark');
+          } else {
+            setCookie('cookie_consent', 'none');
+            applyTheme('dark');
+          }
+
+          banner.classList.add('hidden');
+          isProcessing = false;
+          allBtns.forEach(function(b) { b.disabled = false; });
+        }, 700);
+      });
+    });
+  </script>
+</body>
+</html>

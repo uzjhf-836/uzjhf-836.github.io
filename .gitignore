@@ -1,0 +1,4 @@
+#生成脚本
+/blogs/create_article.py
+/blogs/*.txt
+/$TEMP.~ARTICLE.md
