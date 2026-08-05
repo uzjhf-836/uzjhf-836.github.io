@@ -140,5 +140,3 @@ git push
 > Chess Alpha:国象棋子字体（仅个人非商用，[LICENSE](/font/alpha/LICENSE_Chess_Alpha.txt)）
 
 > 我:对网站的开发
-
-> 
