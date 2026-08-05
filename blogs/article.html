@@ -67,7 +67,7 @@
       </div>
       </div>
 
-      <!-- ===== 文章 ===== -->
+      <!-- ===== 文章（正文由 article.html?id=N 动态 fetch /blogs/articles/N.md）===== -->
       <article class="card-light article fade-in fade-in-2">
       <div class="light"></div>
       <div class="article-meta">
@@ -76,37 +76,11 @@
         <div class="blog-tags" id="artTags"></div>
       </div>
       <h1 class="article-title" id="artTitle"></h1>
-      <div class="article-body" id="artBody"></div>
+      <div class="article-body" id="artBody">
+        <div class="article-loading">加载中…</div>
+      </div>
     </article>
     </div>
-
-    <!-- ===== 正文 Markdown（支持混写原生 HTML，marked 渲染）===== -->
-    <script type="text/markdown" id="artBodyMd">
-## 欢迎
-
-这是我的第一篇博客，正文支持 **Markdown** 混写原生 HTML。
-
-- 支持 **加粗**、*斜体*、`行内代码`
-- 支持列表、引用、代码块
-- 支持 `<span style="color:#ff6b6b">内嵌 HTML</span>`，格式原样保留
-
-~~一句话：好好写代码，别写屎山。~~
-^^^就要写屎山！！！
-
-### 代码块
-
-```js
-function hello() {
-  console.log('Hello, Zhixie!');
-}
-```
-```python
-print("This is a Blog!")
-```
-### 原生 HTML 原样输出
-
-<p style="padding:12px 16px;border-radius:10px;background:rgba(166,139,201,0.15);color:#c9b8e0;">这段是原生 HTML 段落，样式、颜色、结构全部保留。</p>
-    </script>
   </div>
 
   <!-- ===== 下拉菜单 ===== -->
@@ -174,7 +148,7 @@ print("This is a Blog!")
     var menuOpen = false;
 
     // ===== 文章属性：从 /blogs/文章.js 读取 =====
-    // 用 ?id=N 指定第 N 篇（默认本篇 /blogs/article/1.html → 第 1 篇）
+    // 文章编号从 ?id=N 取（单模板全靠它定位），非法/缺省回退第 1 篇
     var FAV_COOKIE = 'blog_fav';
     function isFavorite(number) {
       var favs = getCookie(FAV_COOKIE);
@@ -182,10 +156,9 @@ print("This is a Blog!")
       return favs.split(',').indexOf(number) !== -1;
     }
 
-    // 文章编号从文件名取：/blogs/article/2.html → 2（不再用 ?id= 参数）
     var artId = '1';
-    var nameMatch = location.pathname.match(/article\/(\d+)\.html/i);
-    if (nameMatch) artId = nameMatch[1];
+    var idMatch = location.search.replace(/^\?/, '').match(/(?:^|&)id=([^&]+)/i);
+    if (idMatch && /^\d+$/.test(idMatch[1])) artId = idMatch[1];
     var artData = 文章[artId];
     if (!artData) {
       artId = Object.keys(文章)[0];
@@ -238,50 +211,62 @@ print("This is a Blog!")
 
     renderArticleMeta();
 
-    // ===== 正文：marked 渲染 Markdown，原生 HTML 原样透传 =====
-    var artMd = document.getElementById('artBodyMd');
+    // ===== 正文：fetch 对应 .md 文件，marked 渲染（原生 HTML 原样透传）=====
     var artBody = document.getElementById('artBody');
-    if (artMd) {
-      if (window.marked) {
-        artBody.innerHTML = marked.parse(artMd.textContent);
-        // 代码块：顶部语言名 + 分割线；语法高亮
-        artBody.querySelectorAll('pre').forEach(function(pre) {
-          var code = pre.querySelector('code');
-          if (!code) return;
-          if (window.hljs) hljs.highlightElement(code);
-          // 从 ```js 取语言名，非空才插语言头（无语言就不显示）
-          var m = (code.className || '').match(/language-([\w+-]+)/);
-          if (m && m[1]) {
-            var hdr = document.createElement('div');
-            hdr.className = 'code-lang';
-            hdr.textContent = m[1];
-            pre.insertBefore(hdr, code);
-          }
-        });
-      } else {
-        artBody.textContent = artMd.textContent; // marked 未加载时兜底显示原文
-      }
-    }
+    fetch('/blogs/articles/' + artId + '.md')
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(mdText) {
+        if (window.marked) {
+          artBody.innerHTML = marked.parse(mdText);
+          // 代码块：顶部语言名 + 分割线；语法高亮
+          artBody.querySelectorAll('pre').forEach(function(pre) {
+            var code = pre.querySelector('code');
+            if (!code) return;
+            if (window.hljs) hljs.highlightElement(code);
+            // 从 ```js 取语言名，非空才插语言头（无语言就不显示）
+            var m = (code.className || '').match(/language-([\w+-]+)/);
+            if (m && m[1]) {
+              var hdr = document.createElement('div');
+              hdr.className = 'code-lang';
+              hdr.textContent = m[1];
+              pre.insertBefore(hdr, code);
+            }
+          });
+        } else {
+          artBody.textContent = mdText; // marked 未加载时兜底显示原文
+        }
+        // 正文渲染完，字数/阅读时间/进度都在这之后才算得准
+        updateWordStats(mdText);
+        updateReadingProgress();
+      })
+      .catch(function() {
+        artBody.innerHTML = '<div class="article-loading">正文加载失败喵… 找不到 /blogs/articles/' + artId + '.md</div>';
+      });
 
     // ===== 总字数 + 预计阅读时间：a[10] 1=自动按字数算，0=用 a[9] 填的分钟数 =====
-    var readTimeEl = document.getElementById('readTime');
-    var wordCountEl = document.getElementById('wordCount');
-    var words = 0;
-    if (artMd) {
-      var txt = artMd.textContent;
-      var cjk = (txt.match(/[一-鿿㐀-䶿]/g) || []).length;
-      var other = txt.replace(/[一-鿿㐀-䶿]/g, ' ').match(/[a-zA-Z0-9_]+/g);
-      words = cjk + (other ? other.length : 0);
-    }
-    if (wordCountEl) wordCountEl.textContent = words;
-    if (readTimeEl) {
-      var mins;
-      if (artData[10] !== 0 && artMd) {
-        mins = Math.max(1, Math.round(words / 300));
-      } else {
-        mins = Math.max(1, parseInt(artData[9], 10) || 1);
+    function updateWordStats(mdText) {
+      var readTimeEl = document.getElementById('readTime');
+      var wordCountEl = document.getElementById('wordCount');
+      var words = 0;
+      if (mdText) {
+        var txt = mdText;
+        var cjk = (txt.match(/[一-鿿㐀-䶿]/g) || []).length;
+        var other = txt.replace(/[一-鿿㐀-䶿]/g, ' ').match(/[a-zA-Z0-9_]+/g);
+        words = cjk + (other ? other.length : 0);
       }
-      readTimeEl.textContent = mins + ' 分钟';
+      if (wordCountEl) wordCountEl.textContent = words;
+      if (readTimeEl) {
+        var mins;
+        if (artData[10] !== 0) {
+          mins = Math.max(1, Math.round(words / 300));
+        } else {
+          mins = Math.max(1, parseInt(artData[9], 10) || 1);
+        }
+        readTimeEl.textContent = mins + ' 分钟';
+      }
     }
 
     // ===== 阅读进度：按整页滚动位置算 %（从页面顶端计起，手机上不会等到文章滚进视口才动）=====
@@ -289,22 +274,20 @@ print("This is a Blog!")
     var readingPct = document.getElementById('readingPct');
     var readingTop = document.getElementById('readingTop');
     var barRow = document.querySelector('.reading-bar-row');
-    if (readingBar && readingPct) {
-      function updateReadingProgress() {
-        var doc = document.documentElement;
-        var total = doc.scrollHeight - window.innerHeight; // 整页可滚动距离
-        var pct = total <= 0 ? 100 : Math.round((window.scrollY / total) * 100);
-        pct = Math.min(100, Math.max(0, pct));
-        readingBar.style.width = pct + '%';
-        readingPct.textContent = pct + '%';
-        // 进度 >=10%：桌面端进度条左缩 + 右侧返回按钮；移动端右下角悬浮按钮
-        if (barRow) barRow.classList.toggle('top-visible', pct >= 10);
-        document.body.classList.toggle('fab-visible', pct >= 10);
-      }
-      updateReadingProgress();
-      window.addEventListener('scroll', updateReadingProgress);
-      window.addEventListener('resize', updateReadingProgress);
+    function updateReadingProgress() {
+      if (!readingBar || !readingPct) return;
+      var doc = document.documentElement;
+      var total = doc.scrollHeight - window.innerHeight; // 整页可滚动距离
+      var pct = total <= 0 ? 100 : Math.round((window.scrollY / total) * 100);
+      pct = Math.min(100, Math.max(0, pct));
+      readingBar.style.width = pct + '%';
+      readingPct.textContent = pct + '%';
+      // 进度 >=10%：桌面端进度条左缩 + 右侧返回按钮；移动端右下角悬浮按钮
+      if (barRow) barRow.classList.toggle('top-visible', pct >= 10);
+      document.body.classList.toggle('fab-visible', pct >= 10);
     }
+    window.addEventListener('scroll', updateReadingProgress);
+    window.addEventListener('resize', updateReadingProgress);
     if (readingTop) {
       readingTop.addEventListener('click', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -397,6 +380,7 @@ print("This is a Blog!")
     // ===== URL 参数强制主题（不存 cookie）=====
     // ?1 / ?w / ?white / ?light  → 亮色
     // ?0 / ?b / ?black / ?dark   → 黑色
+    // 只认参数名（裸参数），不会把 ?id=1 误判成亮色
     function getThemeFromURL() {
       var qs = location.search.replace(/^\?/, '');
       if (!qs) return null;
@@ -408,9 +392,7 @@ print("This is a Blog!")
       for (var i = 0; i < parts.length; i++) {
         var kv = parts[i].split('=');
         var key = kv[0].toLowerCase();
-        var val = (kv.length > 1) ? kv[1].toLowerCase() : key;
         if (map[key]) return map[key];
-        if (map[val]) return map[val];
       }
       return null;
     }

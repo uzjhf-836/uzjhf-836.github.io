@@ -1,4 +1,9 @@
 #生成脚本
-/blogs/create_article.py
+/blogs/*.py
 /blogs/*.txt
 /$*.md
+
+#Python 缓存
+__pycache__/
+*.py[cod]
+#No newline at end of file

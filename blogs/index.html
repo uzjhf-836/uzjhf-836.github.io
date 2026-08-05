@@ -245,7 +245,7 @@
 
         // 阅读按钮：a[6] 0=无 1=有（缺省显示）；跳转 URL：a[7] "None" 或缺省 = 编号默认页
         var hasReadBtn = a[6] === 0 ? 0 : 1;
-        var artLink = (typeof a[7] === 'string' && a[7] && a[7] !== 'None') ? a[7] : '/blogs/article/' + it.key + '.html';
+        var artLink = (typeof a[7] === 'string' && a[7] && a[7] !== 'None') ? a[7] : '/blogs/article.html?id=' + it.key;
 
         idx++;
         var delay = Math.min(2 + (idx % 5), 6);
@@ -569,9 +569,8 @@
       for (var i = 0; i < parts.length; i++) {
         var kv = parts[i].split('=');
         var key = kv[0].toLowerCase();
-        var val = (kv.length > 1) ? kv[1].toLowerCase() : key;
+        // 只认参数名（裸参数 ?white / ?w / ?1 / ?0），避免 ?pin=0 等带值参数被误判成主题
         if (map[key]) return map[key];
-        if (map[val]) return map[val];
       }
       return null;
     }
